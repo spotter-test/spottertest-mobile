@@ -1,0 +1,1 @@
+import { signupUrl,loginUrl } from "./endpoints";
