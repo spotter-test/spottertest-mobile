@@ -22,6 +22,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons,AntDesign, Fontisto,MaterialIcons } from "@expo/vector-icons";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useRouter } from 'expo-router';
+import { searchFlights,searchAirports } from '@/utils/skyScrapperApi';
 
 
 const { width, height } = Dimensions.get("window");
@@ -72,12 +73,6 @@ const index = () => {
     hideReturnPicker();
   };
   
-  const handleSwapLocations = () => {
-    const temp = departure;
-    setDeparture(destination);
-    setDestination(temp);
-  };
-
   const formatDate = (date: any) => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -101,6 +96,32 @@ const index = () => {
       </Pressable>
     </Modal>
   );
+
+  const [loading, setLoading] = useState(false);
+  const [flights, setFlights] = useState<any[]>([]);
+
+  const handleSearch = async () => {
+    try {
+      // Step 1: Get skyIds
+      const originData: any = await searchAirports(departure);
+      const destinationData: any = await searchAirports(destination);
+
+      const originSkyId = originData.data[0].skyId;
+      const originEntityId = originData.data[0].entityId;
+
+      const destinationSkyId = destinationData.data[0].skyId;
+      const destinationEntityId = destinationData.data[0].entityId;
+      
+
+      // Step 2: Search flights
+      const _flights: any = await searchFlights(originSkyId, destinationSkyId, departureDate,travelers,flightClass,returnDate,originEntityId,destinationEntityId);
+     
+      // setFlights(_flights);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
 
 
   
@@ -130,38 +151,10 @@ const index = () => {
               <Fontisto name="bell" size={24} color="black" />
             </TouchableOpacity>
           </View>
-           <View
-            style={styles.headerSection}
-           >
-              <Image 
-                source={require('../../assets/images/2.jpg')}
-                resizeMode='cover'
-                style={styles.image}
-              />
-              <View
-                style={{
-                  position: 'absolute',
-                  bottom: 40,
-                  left: 20
-                }}
-              >
-                <Text 
-                  style={{
-                    color: 'white',
-                    fontSize: 24
-                  }}></Text>
-                <Text 
-                  style={{
-                    color: 'white',
-                    width: '75%',
-                    fontFamily: 'PlusJakarta-SemiBold'
-                  }}></Text>
-              </View>
-            </View> 
+
             <View 
               style={styles.flightsContainer}
             >
-              <Text style={styles.flightsHeaderText}> Flights </Text>
                <View style={styles.searchContainer}>
                 
                   <View style={styles.topOptionsRow}>
@@ -225,13 +218,19 @@ const index = () => {
                     </TouchableOpacity>
                   </View>
 
-                  <TouchableOpacity style={styles.searchButton}>
-
+                  <TouchableOpacity 
+                    style={styles.searchButton}
+                    onPress={handleSearch}
+                  >
                     <Text style={styles.searchButtonText}>Search</Text>
                   </TouchableOpacity>
                 </View>
             
-              </View> 
+            </View> 
+            <View style={styles.flightsContainer}>
+              <Text style={styles.flightsHeaderText}> Flights</Text>
+              
+            </View>
              <OptionModal
                 visible={isTripTypeModalVisible}
                 onClose={() => setTripTypeModalVisible(false)}
@@ -326,7 +325,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   flightsContainer: {
-    marginTop: 50
+    marginTop: 30
   },
   flightsHeaderText: {
     fontSize: 20,
