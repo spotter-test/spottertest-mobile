@@ -107,19 +107,6 @@ export default function VerificationScreen() {
                 />
               ))}
             </View>
-
-            <View style={styles.timerRow}>
-              {/* <View style={styles.timerBox}>
-                <Text style={styles.timerText}>{minutes}</Text>
-              </View> */}
-              <View style={styles.timerBox}>
-                <Text style={styles.timerText}>{seconds}</Text>
-              </View>
-            </View>
-            <View style={styles.timerLabelRow}>
-              {/* <Text style={styles.timerLabel}>Minutes</Text> */}
-              <Text style={styles.timerLabel}>Seconds</Text>
-            </View>
             
             <TouchableOpacity
               style={styles.button}
@@ -131,7 +118,7 @@ export default function VerificationScreen() {
             <View style={styles.resendContainer}>
                 <Text style={styles.resendText}>Didn't receive the code?</Text>
                 <TouchableOpacity disabled={timeLeft > 0}>
-                    <Text style={[styles.resendLink, {color: timeLeft > 0 ? '#888' : '#3B0A45'}]}>
+                    <Text style={[styles.resendLink]}>
                         Resend
                     </Text>
                 </TouchableOpacity>
@@ -216,7 +203,7 @@ const styles = StyleSheet.create({
     color: '#555' 
   },
  button: {
-    backgroundColor: '#3B0A45',
+    backgroundColor: '#007AFF',
     paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 15,
@@ -244,6 +231,6 @@ const styles = StyleSheet.create({
     fontSize: 20, 
     fontFamily: 'PlusJakarta-Bold',
     marginTop: 20 ,
-    color: 'black'
+    color: '#007AFF'
   }
 });

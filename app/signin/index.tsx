@@ -67,15 +67,7 @@ export default function index() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.separatorText}>Or sign in with</Text>
-
-            <View style={styles.socialContainer}>
-              <TouchableOpacity style={[styles.socialButton, { marginLeft: 10 }]}>
-                <Text style={styles.socialButtonText}>Google</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          
           <View style={styles.resendContainer}>
                           <Text style={styles.resendText}>Don't have an account?</Text>
                           <TouchableOpacity 
@@ -84,7 +76,7 @@ export default function index() {
                               marginTop: 20
                             }}
                           >
-                              <Text style={{color: '#3B0A45',fontFamily: 'PlusJakarta-Bold',fontSize: 18}}>
+                              <Text style={{color: '#007AFF',fontFamily: 'PlusJakarta-Bold',fontSize: 18}}>
                                   Sign up
                               </Text>
                           </TouchableOpacity>
@@ -116,7 +108,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   input: {
-    backgroundColor: '#F3F1F8', // A light lavender color
+    backgroundColor: '#f1f3f8ff', // A light lavender color
     borderRadius: 15,
     padding: 18,
     fontSize: 16,
@@ -170,7 +162,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
    button: {
-    backgroundColor: '#3B0A45',
+    backgroundColor: '#007AFF',
     paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 15,

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   input: {
-    backgroundColor: '#F3F1F8', // A light lavender color
+    backgroundColor: '#f1f3f8ff', // A light lavender color
     borderRadius: 15,
     padding: 18,
     fontSize: 16,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
    button: {
-    backgroundColor: '#3B0A45',
+    backgroundColor: '#007AFF',
     paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 15,

@@ -14,18 +14,11 @@ import {
   ActivityIndicator
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { AntDesign} from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
 import FlightCard from '@/components/flightDetails/card';
 import { data } from '@/constants/flightDetails';
-
-
-const { width, height } = Dimensions.get("window");
-const screenWidth = Dimensions.get("window").width;
-
-const TRIP_TYPES = ['Round trip', 'One way'];
-const FLIGHT_CLASSES = ['Economy', 'Premium', 'Business', 'First'];
 
 
 const index = () => {

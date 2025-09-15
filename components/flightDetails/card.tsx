@@ -1,12 +1,24 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TouchableOpacity,Linking,Alert } from 'react-native'
+import React,{useState,useEffect} from 'react'
 import { useRouter } from 'expo-router';
+import { getToken } from '@/utils/token';
 
 const FlightCard = ({ data }: any) => {
     const router = useRouter();
     const itinerary = data.data.itinerary;
     const legs = itinerary.legs;
     const pricingOptions = itinerary.pricingOptions;
+
+    const [token,setToken] = useState();
+    
+      const GetToken = async() => {
+        const _token: any = await getToken();
+        setToken(_token);
+      }
+    
+      useEffect(() => {
+        GetToken();
+      },[])
 
     // Format duration from minutes to hours and minutes
     const formatDuration = (minutes: number) => {
@@ -97,7 +109,22 @@ const FlightCard = ({ data }: any) => {
                 {/* Book Button */}
                 <TouchableOpacity 
                     style={styles.bookButton}
-                    onPress={() => router.push(bestPrice.agents[0].url)}
+                    onPress={() => {
+                        if (token) {
+                        // ✅ User is logged in → open booking link
+                        Linking.openURL(bestPrice.agents[0].url);
+                        } else {
+                        // 🚨 Show alert first
+                        Alert.alert(
+                            'Login Required',
+                            'You need to log in before booking this flight.',
+                            [
+                            { text: 'Cancel', style: 'cancel' },
+                            { text: 'Login', onPress: () => router.push('/signin') },
+                            ]
+                        );
+                        }
+                    }}
                 >
                     <Text style={styles.bookButtonText}>Book Now ${bestPrice.totalPrice}</Text>
                 </TouchableOpacity>
@@ -119,12 +146,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 12,
         padding: 16,
-        backgroundColor: 'white',
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 4,
-        // elevation: 3,
+        backgroundColor: 'white'
     },
     routeSummary: {
         flexDirection: 'column',

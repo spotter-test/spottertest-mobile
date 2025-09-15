@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakarta-Regular'
   },
    button: {
-    backgroundColor: '#3B0A45',
+    backgroundColor: '#007AFF',
     paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 15,
