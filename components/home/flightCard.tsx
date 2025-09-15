@@ -1,4 +1,6 @@
 import { StyleSheet, Text, View,Image,TouchableOpacity } from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Fontisto from '@expo/vector-icons/Fontisto';
 import React from 'react'
 
 // interface flightCardProps {
@@ -10,21 +12,73 @@ import React from 'react'
 
 const FlightCard = ({data}: any) => {
   return (
-   <TouchableOpacity style={{ padding: 12 }}>
+   <TouchableOpacity style={{ padding: 12,marginTop: 10 }}>
       <Image
         source={{ uri: data.content.image.url }} 
         style={{ 
           width: '100%', 
-          height: 140,
+          height: 150,
           borderRadius: 10,
+          backgroundColor: '#F3F1F8'
         }}        
         resizeMode="cover"
       />
-      <Text style={{ marginTop: 8 }}>{data.content.location.name}</Text>
+      <View 
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Text style={styles.title}>{data.content.location.name}</Text>
+        <Text style={styles.title}>{data.content.flightQuotes.cheapest.price}</Text>
+      </View>
+      <View>{
+        data.content.flightRoutes.directFlightsAvailable ? 
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            marginTop: 5
+          }}
+        >
+          <Ionicons name="paper-plane-outline" size={20} color="black" />
+          <Text
+            style={{
+              fontWeight: '500'
+            }}
+          >Direct Flight Available</Text>
+        </View> : ''
+        }</View>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            marginTop: 5
+          }}
+        >
+          <Fontisto name="world" size={20} color="black" />
+          <Text
+            style={{
+              fontWeight: '500'
+            }}
+          >{data.content.location.continent.name}</Text>
+        </View>
     </TouchableOpacity>
   )
 }
 
 export default FlightCard
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  title:{ 
+    marginTop: 8,
+    fontWeight: '500',
+    fontSize: 17 
+  }
+})

@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   flightsContainer: {
-    marginTop: 30
+    marginTop: 50
   },
   flightsHeaderText: {
     fontSize: 20,
