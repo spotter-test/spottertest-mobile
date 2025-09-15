@@ -11,6 +11,7 @@ import {
   Dimensions,
   Modal,
   Pressable,
+  ActivityIndicator,
   FlatList,
   Linking,
   ImageBackground,
@@ -104,20 +105,21 @@ const index = () => {
   
 
   const handleSearch = async () => {
+    setLoading(true);
     try {
       // Step 1: Get skyIds
-      const originData: any = await searchAirports(departure);
-      const destinationData: any = await searchAirports(destination);
+    //   const originData: any = await searchAirports(departure);
+    //   const destinationData: any = await searchAirports(destination);
 
-      const originSkyId = originData.data[0].skyId;
-      const originEntityId = originData.data[0].entityId;
+    //   const originSkyId = originData.data[0].skyId;
+    //   const originEntityId = originData.data[0].entityId;
 
-      const destinationSkyId = destinationData.data[0].skyId;
-      const destinationEntityId = destinationData.data[0].entityId;
+    //   const destinationSkyId = destinationData.data[0].skyId;
+    //   const destinationEntityId = destinationData.data[0].entityId;
 
-      // Step 2: Search flights
-      const _flights: any = await searchFlights(originSkyId, destinationSkyId, departureDate,travelers,flightClass,returnDate,originEntityId,destinationEntityId);
-      console.log(_flights);
+    //   // Step 2: Search flights
+    //   const _flights: any = await searchFlights(originSkyId, destinationSkyId, departureDate,travelers,flightClass,returnDate,originEntityId,destinationEntityId);
+    //   console.log(_flights);
       // setFlights(_flights);
     } catch (err) {
       console.error("Error:", err);
@@ -257,6 +259,20 @@ const index = () => {
                   <TouchableOpacity style={styles.doneButton} onPress={() => setTravelersModalVisible(false)}>
                       <Text style={styles.doneButtonText}>Done</Text>
                   </TouchableOpacity>
+                </View>
+              </Pressable>
+            </Modal>
+            <Modal visible={loading} transparent={true} animationType="fade" onRequestClose={() => setLoading(false)}>
+                <Pressable style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: '600',
+                      marginVertical: 20
+                    }}
+                  >Loading...</Text>
+                  <ActivityIndicator size="large" color={'#1d2855'}/>
                 </View>
               </Pressable>
             </Modal>
