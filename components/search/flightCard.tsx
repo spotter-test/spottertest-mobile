@@ -1,137 +1,149 @@
-import { StyleSheet, Text, View,Image,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 
-// interface flightCardProps {
-//   key: string,
-//   data: {
-
-//   }
-// }
-
-const FlightCard = ({data}: any) => {
+const FlightCard = ({ data }: any) => {
     const router = useRouter();
+    const firstLeg = data.legs[0];
+    const airline = firstLeg.carriers.marketing[0];
 
-  return (
-   <TouchableOpacity 
-        style={{ padding: 12,marginTop: 10 }}
-        onPress={() => {
-            router.push('/flightDetails')
-        }}
-    >
-      {/* <Image
-        source={{ uri: data.content.image.url }} 
-        style={{ 
-          width: '100%', 
-          height: 150,
-          borderRadius: 10,
-          backgroundColor: '#F3F1F8'
-        }}        
-        resizeMode="cover"
-      /> */}
-      <View 
-        style={{
-            borderWidth: 1,
-            borderRadius: 5,
-            padding: 10,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-        }}
-      >
-        <View>
-            {
-                data.legs.map((leg: any) => (
-                    <View 
-                        key={leg.id}
-                        style={{
-                            marginBottom: 40,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 5
-                        }}
-                    >
-                        <Text style={{fontWeight: '500'}}>From: {leg.origin.city}</Text>
-                        <Text style={{fontWeight: '500'}}>To: {leg.destination.city}</Text>
-                        <View
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 5
-                            }}
-                        >
-                            <Text style={{fontWeight: '500'}}>Airport</Text>
-                            <View 
-                                style={{
-                                    gap: 5
-                                }}
-                            >
-                                <Text style={{fontWeight: '500'}}>Departure: {leg.origin.name}</Text>
-                                <Text style={{fontWeight: '500'}}>Arrival: {leg.destination.name}</Text>
-                            </View>
-                        </View>
-                        <View style={{marginTop: 10}}>
-                            <Text style={{fontWeight: '500'}}>
-                                Duration: {Math.floor(leg.durationInMinutes / 60)}h {leg.durationInMinutes % 60}m
-                            </Text>
-                        </View>
-                        <View style={{marginTop: 10}}>
-                            {
-                                leg.carriers.marketing.map((m: any) => (
-                                    <View
-                                        style={{
-                                            gap: 5
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontWeight: '500',
-                                                fontSize: 16
-                                            }}
-                                        >Airline</Text>
-                                        <View
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'row',
-                                                gap: 20,
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <Image 
-                                                source={{ uri: m.logoUrl }} 
-                                                style={{ 
-                                                width: 30, 
-                                                height: 30,
-                                                borderRadius: 5,
-                                                backgroundColor: '#F3F1F8'
-                                                }}        
-                                                resizeMode="cover"
-                                            />
-                                            <Text style={{fontWeight: '500'}}>{m.name}</Text>
-                                        </View>
+    return (
+        <TouchableOpacity 
+            style={styles.container}
+            onPress={() => router.push('/flightDetails')}
+        >
+            <View style={styles.card}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Text style={styles.price}>{data.price.formatted}</Text>
+                    {data.tags?.includes('cheapest') && (
+                        <Text style={styles.tag}>💰 Cheapest</Text>
+                    )}
+                </View>
 
-                                    </View>
-                                ))
-                            }
-                        </View>
+                {/* Route */}
+                <Text style={styles.route}>
+                    {firstLeg.origin.displayCode} → {firstLeg.destination.displayCode}
+                </Text>
 
+                {/* Airline */}
+                <View style={styles.airlineContainer}>
+                    <Image 
+                        source={{ uri: airline.logoUrl }} 
+                        style={styles.airlineLogo}
+                    />
+                    <Text style={styles.airlineName}>{airline.name}</Text>
+                </View>
+
+                {/* Flight Times */}
+                <View style={styles.timeContainer}>
+                    <View style={styles.timeBlock}>
+                        <Text style={styles.time}>{new Date(firstLeg.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
+                        <Text style={styles.airport}>{firstLeg.origin.displayCode}</Text>
                     </View>
-                ))
-            }
-        </View>
-        <Text style={styles.title}>{data.price.formatted}</Text>
-      </View>
-    
-    </TouchableOpacity>
-  )
+                    
+                    <Text style={styles.duration}>
+                        {Math.floor(firstLeg.durationInMinutes / 60)}h {firstLeg.durationInMinutes % 60}m
+                    </Text>
+                    
+                    <View style={styles.timeBlock}>
+                        <Text style={styles.time}>{new Date(firstLeg.arrival).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
+                        <Text style={styles.airport}>{firstLeg.destination.displayCode}</Text>
+                    </View>
+                </View>
+
+                {/* Additional info */}
+                <Text style={styles.additionalInfo}>
+                    {data.legs.length === 2 ? 'Round trip' : 'One way'} • {firstLeg.stopCount === 0 ? 'Direct' : `${firstLeg.stopCount} stop${firstLeg.stopCount > 1 ? 's' : ''}`}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    )
 }
 
 export default FlightCard
 
 const styles = StyleSheet.create({
-  title:{ 
-    marginTop: 8,
-    fontWeight: '500',
-    fontSize: 17 
-  }
+    container: {
+        padding: 12,
+        marginTop: 10
+    },
+    card: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 12,
+        padding: 16,
+        backgroundColor: 'white'
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12
+    },
+    price: {
+        fontWeight: '700',
+        fontSize: 18,
+        color: '#007AFF'
+    },
+    tag: {
+        backgroundColor: '#FFD700',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        fontSize: 12,
+        fontWeight: '600'
+    },
+    route: {
+        fontWeight: '600',
+        fontSize: 16,
+        marginBottom: 8,
+        color: '#333'
+    },
+    airlineContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        gap: 8
+    },
+    airlineLogo: {
+        width: 24,
+        height: 24,
+        borderRadius: 12
+    },
+    airlineName: {
+        fontWeight: '500',
+        fontSize: 14,
+        color: '#666'
+    },
+    timeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8
+    },
+    timeBlock: {
+        alignItems: 'center',
+        flex: 1
+    },
+    time: {
+        fontWeight: '600',
+        fontSize: 16,
+        color: '#333'
+    },
+    airport: {
+        fontWeight: '500',
+        fontSize: 14,
+        color: '#666'
+    },
+    duration: {
+        fontWeight: '500',
+        fontSize: 12,
+        color: '#999'
+    },
+    additionalInfo: {
+        fontSize: 12,
+        color: '#888',
+        textAlign: 'center'
+    }
 })

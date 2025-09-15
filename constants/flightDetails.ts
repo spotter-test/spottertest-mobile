@@ -1,4 +1,4 @@
-export const data = [
+export const data = 
     {
     "status": true,
     "timestamp": 1691009267165,
@@ -7,6 +7,64 @@ export const data = [
         "legs": [
             {
             "id": "13542-2402201235--30598-0-12712-2402201550",
+            "origin": {
+                "id": "13542",
+                "name": "London Gatwick",
+                "displayCode": "LGW",
+                "city": "London"
+            },
+            "destination": {
+                "id": "12712",
+                "name": "New York John F. Kennedy",
+                "displayCode": "JFK",
+                "city": "New York"
+            },
+            "segments": [
+                {
+                "id": "13542-12712-2402201235-2402201550--30598",
+                "origin": {
+                    "id": "13542",
+                    "name": "London Gatwick",
+                    "displayCode": "LGW",
+                    "city": "London"
+                },
+                "destination": {
+                    "id": "12712",
+                    "name": "New York John F. Kennedy",
+                    "displayCode": "JFK",
+                    "city": "New York"
+                },
+                "duration": 495,
+                "dayChange": 0,
+                "flightNumber": "Z0701",
+                "departure": "2024-02-20T12:35:00",
+                "arrival": "2024-02-20T15:50:00",
+                "marketingCarrier": {
+                    "id": "-30598",
+                    "name": "Norse Atlantic Airways (UK)",
+                    "displayCode": "Z0",
+                    "displayCodeType": "IATA",
+                    "logo": "https://logos.skyscnr.com/images/airlines/favicon/I).png",
+                    "altId": "I)"
+                },
+                "operatingCarrier": {
+                    "id": "-30598",
+                    "name": "Norse Atlantic Airways (UK)",
+                    "displayCode": "Z0",
+                    "displayCodeType": "IATA",
+                    "logo": "https://logos.skyscnr.com/images/airlines/favicon/I).png",
+                    "altId": "I)"
+                }
+                }
+            ],
+            "duration": 495,
+            "stopCount": 0,
+            "departure": "2024-02-20T12:35:00",
+            "arrival": "2024-02-20T15:50:00",
+            "dayChange": 0
+            },
+            {
+            "id": "13542-2402201235--30598-0-12712-24022015780",
             "origin": {
                 "id": "13542",
                 "name": "London Gatwick",
@@ -897,4 +955,3 @@ export const data = [
         "pollingCompleted": true
     }
     }
-]

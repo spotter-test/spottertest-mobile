@@ -11,21 +11,14 @@ import {
   Dimensions,
   Modal,
   Pressable,
-  ActivityIndicator,
-  FlatList,
-  Linking,
-  ImageBackground,
-  Keyboard
+  ActivityIndicator
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React,{useState,useRef, useEffect} from 'react'
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons,AntDesign, Fontisto,MaterialIcons } from "@expo/vector-icons";
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import React,{useState} from 'react'
+import { AntDesign} from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
-import { searchFlights,searchAirports,searchFlightEveryWhere } from '@/utils/skyScrapperApi';
-import FlightCard from '@/components/search/flightCard';
-import { Data } from '@/constants/data';
+import FlightCard from '@/components/flightDetails/card';
+import { data } from '@/constants/flightDetails';
 
 
 const { width, height } = Dimensions.get("window");
@@ -70,11 +63,7 @@ const index = () => {
                   marginTop: 25
                 }}
               >
-                {Data.map((entry) =>
-                  entry.data.itineraries.map((itinerary) => (
-                    <FlightCard key={itinerary.id} data={itinerary} />
-                  ))
-                )}
+                <FlightCard data={data} />
 
               </View>
             
@@ -130,6 +119,24 @@ const styles = StyleSheet.create({
   modalOptionText: { color: 'black', fontSize: 18 },
   selectedOptionText: { color: 'black', fontWeight: 'bold' },
   modalTitle: { color: 'black', fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
+  searchButton: {
+    backgroundColor: '#1280ED',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: 15,
+    alignSelf: 'center',
+    paddingHorizontal: 40,
+    marginTop: 20
+  },
+  searchButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 8,
+    color: 'white'
+  },
 
   results: {
     marginTop: 20
