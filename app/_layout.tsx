@@ -21,6 +21,11 @@ export default function RootLayout() {
         <Stack.Screen name='welcome'/>
         <Stack.Screen name='(tabs)'/>
         <Stack.Screen name='flightDetails'/>
+        <Stack.Screen name='otp'/>
+        <Stack.Screen name='forgotpassword'/>
+        <Stack.Screen name='signup'/>
+        <Stack.Screen name='signin'/>
+
        
       </Stack>
     </>
