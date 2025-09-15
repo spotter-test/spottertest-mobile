@@ -77,8 +77,10 @@ const index = () => {
             style={styles.header}
           >
             <Text
-              style={styles.headerText}
-            >Explore</Text>
+              style={{
+                fontSize: 18
+              }}
+            >Welcome,</Text>
             <TouchableOpacity
             >
               <Fontisto name="bell" size={24} color="black" />
@@ -93,7 +95,7 @@ const index = () => {
            >
               <Text 
                 style={{
-                  fontWeight: '400',
+                  fontWeight: '500',
                   fontSize: 18,
                   marginBottom: 20
                 }}
