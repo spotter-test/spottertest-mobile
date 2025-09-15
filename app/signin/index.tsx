@@ -54,7 +54,7 @@ export default function index() {
             />
 
             <TouchableOpacity
-                onPress={() => router.push('/forgotPassword')}
+                onPress={() => router.push('/forgotpassword')}
             >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>

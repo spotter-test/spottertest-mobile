@@ -321,7 +321,7 @@ const index = () => {
                   <CustomeButtom 
                     title='Yes'
                     onPress={() => setLogoutModal(false)}
-                    color={'#1AACD5'}
+                    color={'#1280ED'}
                   />
                   <CustomeButtom 
                     title='No'
@@ -351,7 +351,7 @@ const index = () => {
                   <CustomeButtom 
                     title='Yes'
                     onPress={() => setDeleteAccountModal(false)}
-                    color={'#1AACD5'}
+                    color={'#1280ED'}
                   />
                   <CustomeButtom 
                     title='No'

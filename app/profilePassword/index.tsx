@@ -2,30 +2,32 @@ import {
     StyleSheet, 
     Text, 
     View,
-    SafeAreaView,
     TextInput,
     ScrollView,
     Platform,
     Image,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    TouchableOpacity
   } from 'react-native'
+  import { SafeAreaView } from 'react-native-safe-area-context';
   import Entypo from '@expo/vector-icons/Entypo';
+  import FontAwesome from '@expo/vector-icons/FontAwesome';
   import React,{useState} from 'react';
   import CustomeButtom from '@/components/CustomeButtom';
-  import { TouchableOpacity } from 'react-native-gesture-handler';
+
   import { router,useLocalSearchParams } from 'expo-router';
   import AntDesign from '@expo/vector-icons/AntDesign';
-  import Validationerror from '@/components/Validationerror';
+//   import Validationerror from '@/components/Validationerror';
   import * as Yup from 'yup';
   import { useFormik } from 'formik';
-  import { useAuth } from '@/hooks/useAuth';
+//   import { useAuth } from '@/hooks/useAuth';
   import Toast from 'react-native-toast-message';
   import ModalPopup from '@/components/ModalPopup';
   
   const index = () => {
     const {email,previous_screen} = useLocalSearchParams();
     const [showPassword,setShowPassword] = useState(false);
-    const {UpdatePassword} = useAuth();
+    // const {UpdatePassword} = useAuth();
     const [visible,setVisible] = useState(false);
     
     const formData = useFormik({
@@ -149,7 +151,7 @@ import {
                 <CustomeButtom 
                   title="Change password" 
                   onPress={formData.handleSubmit}
-                  color={'#1AACD5'}
+                  color={'#1280ED'}
                 />
               </View>
               <ModalPopup 
@@ -168,9 +170,7 @@ import {
                     marginTop: '8%'
                   }}
                 >
-                  <Image 
-                    source={require('../../assets/images/Vector.png')}
-                  />
+                    <FontAwesome name="check-circle" size={24} color="black" />
                 </View>
                 <Text
                   style={{
@@ -188,7 +188,7 @@ import {
                   <CustomeButtom 
                     title='Continue'
                     onPress={() => setVisible(false)}
-                    color={'#1AACD5'}
+                    color={'#1280ED'}
                   />
                 </View>
               </View>
