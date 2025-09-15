@@ -13,6 +13,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => {
             const iconNames: Record<string, keyof typeof Ionicons.glyphMap> = {
               index: "home-outline",
+              search: "search-outline",
               flights: "paper-plane-outline",
               profile: "person-outline",
             };
@@ -42,6 +43,12 @@ export default function TabLayout() {
           name="index"
           options={{
             title: 'Home'
+          }}
+        />
+        <Tabs.Screen
+          name="search"
+          options={{
+            title: 'Search'
           }}
         />
         <Tabs.Screen
