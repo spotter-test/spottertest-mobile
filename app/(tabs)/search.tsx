@@ -145,7 +145,9 @@ const index = () => {
           }}
         >  
             <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>Search Flights</Text>
+                {
+                  Data ? <Text style={styles.headerText}>Search Flights</Text> : ''
+                }
             </View>
           
             <View 

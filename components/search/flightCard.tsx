@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View,Image,TouchableOpacity } from 'react-native'
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Fontisto from '@expo/vector-icons/Fontisto';
 import React from 'react'
+import { useRouter } from 'expo-router';
 
 // interface flightCardProps {
 //   key: string,
@@ -11,9 +10,14 @@ import React from 'react'
 // }
 
 const FlightCard = ({data}: any) => {
+    const router = useRouter();
+
   return (
    <TouchableOpacity 
         style={{ padding: 12,marginTop: 10 }}
+        onPress={() => {
+            router.push('/flightDetails')
+        }}
     >
       {/* <Image
         source={{ uri: data.content.image.url }} 
