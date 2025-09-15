@@ -14,7 +14,6 @@ export default function TabLayout() {
             const iconNames: Record<string, keyof typeof Ionicons.glyphMap> = {
               index: "home-outline",
               search: "search-outline",
-              flights: "paper-plane-outline",
               profile: "person-outline",
             };
           
@@ -49,12 +48,6 @@ export default function TabLayout() {
           name="search"
           options={{
             title: 'Search'
-          }}
-        />
-        <Tabs.Screen
-          name="flights"
-          options={{
-            title: 'Flights'
           }}
         />
         <Tabs.Screen
