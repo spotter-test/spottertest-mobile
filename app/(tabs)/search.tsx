@@ -142,6 +142,9 @@ const index = () => {
             margin: 'auto'
           }}
         >  
+            <View style={styles.headerContainer}>
+                <Text style={styles.headerText}>Search Flights</Text>
+            </View>
           
             <View 
               style={styles.flightsContainer}
@@ -258,20 +261,20 @@ const index = () => {
               </Pressable>
             </Modal>
  
-          <DateTimePickerModal
-            isVisible={isDeparturePickerVisible}
-            mode="date"
-            onConfirm={handleDepartureConfirm}
-            onCancel={hideDeparturePicker}
-            date={departureDate}
-          />
-          <DateTimePickerModal
-            isVisible={isReturnPickerVisible}
-            mode="date"
-            onConfirm={handleReturnConfirm}
-            onCancel={hideReturnPicker}
-            date={returnDate}
-          />
+            <DateTimePickerModal
+                isVisible={isDeparturePickerVisible}
+                mode="date"
+                onConfirm={handleDepartureConfirm}
+                onCancel={hideDeparturePicker}
+                date={departureDate}
+            />
+            <DateTimePickerModal
+                isVisible={isReturnPickerVisible}
+                mode="date"
+                onConfirm={handleReturnConfirm}
+                onCancel={hideReturnPicker}
+                date={returnDate}
+            />
         </ScrollView>
       </KeyboardAvoidingView>
   </SafeAreaView>
@@ -285,6 +288,13 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: "#fff",
     // marginTop: 50 
+  },
+  headerContainer: {
+    marginTop: 20
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: '600'
   },
   flightsContainer: {
     marginTop: 30
