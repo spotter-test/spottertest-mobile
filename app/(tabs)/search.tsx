@@ -24,8 +24,8 @@ import { Ionicons,AntDesign, Fontisto,MaterialIcons } from "@expo/vector-icons";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useRouter } from 'expo-router';
 import { searchFlights,searchAirports,searchFlightEveryWhere } from '@/utils/skyScrapperApi';
-import { results } from '@/constants/flightsEverywhere';
-import FlightCard from '../../components/home/flightCard';
+import FlightCard from '@/components/search/flightCard';
+import { Data } from '@/constants/data';
 
 
 const { width, height } = Dimensions.get("window");
@@ -222,7 +222,23 @@ const index = () => {
                   </TouchableOpacity>
                 </View>
             
-            </View>  
+            </View> 
+            <View style={styles.results}>
+              <Text>Results: </Text>
+              <View
+                style={{
+                  marginTop: 25
+                }}
+              >
+                {Data.map((entry) =>
+                  entry.data.itineraries.map((itinerary) => (
+                    <FlightCard key={itinerary.id} data={itinerary} />
+                  ))
+                )}
+
+              </View>
+            
+            </View> 
              <OptionModal
                 visible={isTripTypeModalVisible}
                 onClose={() => setTripTypeModalVisible(false)}
@@ -269,10 +285,12 @@ const index = () => {
                     style={{
                       fontSize: 18,
                       fontWeight: '600',
-                      marginVertical: 20
+                      marginVertical: 30
                     }}
                   >Loading...</Text>
-                  <ActivityIndicator size="large" color={'#1d2855'}/>
+                  <ActivityIndicator size="large" color={'#1d2855'} style={{
+                    marginBottom: 30 
+                  }}/>
                 </View>
               </Pressable>
             </Modal>
@@ -445,5 +463,8 @@ const styles = StyleSheet.create({
   travelerCount: { color: 'black', fontSize: 36, fontWeight: 'bold', marginHorizontal: 20 },
   doneButton: { backgroundColor: '', paddingVertical: 12, paddingHorizontal: 40, borderRadius: 25 },
   doneButtonText: { color: 'black', fontSize: 16, fontWeight: 'bold' },
+  results: {
+    marginTop: 20
+  }
 
 })
