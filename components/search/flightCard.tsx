@@ -12,7 +12,9 @@ import React from 'react'
 
 const FlightCard = ({data}: any) => {
   return (
-   <TouchableOpacity style={{ padding: 12,marginTop: 10 }}>
+   <TouchableOpacity 
+        style={{ padding: 12,marginTop: 10 }}
+    >
       {/* <Image
         source={{ uri: data.content.image.url }} 
         style={{ 

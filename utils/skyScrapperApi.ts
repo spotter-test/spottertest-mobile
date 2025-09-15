@@ -48,13 +48,6 @@ export async function searchFlights(origin: string, destination: string, departu
         cabinClass = 'first'
     }
 
-    // console.log(origin)
-    // console.log(destination)
-    // console.log(formatted)
-    // console.log(formattedReturndate)
-    // console.log(originEntityId)
-    // console.log(destinationEntityid)
-
     const res = await fetch(`${apiurl}/searchFlights?originSkyId=${origin}&destinationSkyId=${destination}&originEntityId=${originEntityId}&destinationEntityId=${destinationEntityid}&date=${formatted}&returnDate=${formattedReturndate}&cabinClass=${cabinClass}&adults=${travelers}&sortBy=best&currency=USD&market=en-US&countryCode=US`,{
         method: 'GET',
         headers: {
@@ -90,6 +83,59 @@ export async function searchFlightEveryWhere (originEntityId: string){
 
   } catch (error: any) {
     console.error("SkyScrapper API error:", error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export async function getFlightDetails(
+  origin: string,
+  destination: string,
+  departureDate: Date,
+  people: number,
+  cabin: string
+) {
+  try {
+    // Format date to YYYY-MM-DD
+    const formattedDate = dayjs(departureDate).format("YYYY-MM-DD");
+
+    // Map cabin names to API values
+    let cabinClass = "economy";
+    if (cabin === "Premium") cabinClass = "premium_economy";
+    else if (cabin === "Business") cabinClass = "business";
+    else if (cabin === "First") cabinClass = "first";
+
+    // Build legs array and encode it for the query string
+    const legs = encodeURIComponent(
+      JSON.stringify([
+        {
+          origin: origin,          // e.g. "LAXA"
+          destination: destination, // e.g. "LOND"
+          date: formattedDate      // e.g. "2024-04-11"
+        }
+      ])
+    );
+
+    const url = `${apiurl}/getFlightDetails?legs=${legs}&adults=${people}&currency=USD&locale=en-US&market=en-US&cabinClass=${cabinClass}&countryCode=US`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-rapidapi-host": "sky-scrapper.p.rapidapi.com",
+        "x-rapidapi-key": API_KEY,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data; // contains context, itineraries, carriers, etc.
+  } catch (error: any) {
+    console.error(
+      "SkyScrapper getFlightDetails error:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 }
