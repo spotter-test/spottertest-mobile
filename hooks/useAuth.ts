@@ -2,9 +2,6 @@ import React,{useState} from "react";
 import { 
     SignUp,
     Login,
-    RequestOtp,
-    VerifyOtp,
-    VerifyUser,
     updatePassword,
     getUser
 } from "@/utils/api";
@@ -16,20 +13,6 @@ export const useAuth = () => {
     const [_error,setError] = useState(false);
     const [notification,setNotification] = useState(false);
 
-    const VerifyUserExists = async(data: any) => {
-        const {firstname,lastname,email,password,phonenumber} = data;
-
-        const response = await VerifyUser({
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            password: password,
-            phonenumber: phonenumber
-        });
-
-        const responseData = await response.json();
-        return responseData;
-    }
 
     const GetUser = async(email: string) => {
         const response: any = await getUser(email);
@@ -60,40 +43,15 @@ export const useAuth = () => {
         const response = await Login(data);
         const responseData = await response.json();
         if(responseData.statusCode == 200) {
-            // storeToken("userToken", responseData.token);
+            storeToken(responseData.token);
         } 
         return responseData;
     }
 
-    const RequestOtpForEmail = async(email: string) => {
-        const response = await RequestOtp(email);
-        const responseData = await response.json();
-        console.log(responseData);
-        if(responseData.statusCode == 200) {
-            setNotification(true);
-        }
-        return responseData;
-    }
-
-    const Verifyotp = async(data: any) => {
-        const {email,otp} = data
-        const response = await VerifyOtp({
-            email,otp
-        });
-        const responseData = await response.json();
-        if(responseData.statusCode == 200) {
-            // storeToken("token", responseData.token);
-        } 
-        
-        return responseData
-    }
 
     return {
         CreateAccount,
         LoginUser,
-        RequestOtpForEmail,
-        Verifyotp,
-        VerifyUserExists,
         _error,
         notification,
         UpdatePassword,

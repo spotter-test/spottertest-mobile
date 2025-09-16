@@ -2,33 +2,11 @@ import {
     signInUrl,
     signUpUrl,
     updateUrl,
-    otpUrl,
-    verifyOtpUrl,
-    verifyUserUrl,
     updatePasswordUrl,
     getUserUrl
 } from "./endpoints";
 import { getToken } from "./token";
-
-export const VerifyUser = async(data: any) => {
-    const {firstname,lastname,email,password,phonenumber} = data;
-
-    const response = await fetch(verifyUserUrl,{
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            firstname,
-            lastname,
-            email,
-            password,
-            phonenumber
-        }),
-    })
  
-    return response;
-} 
 
 export const getUser = async(email: string) => {
     try {
@@ -92,30 +70,7 @@ export const  Login = async(data:any) => {
         },
         body: JSON.stringify(data),
     })
-
-    return response;
-}
-
-export const RequestOtp = async(email:string) => {
-    const response = await fetch(otpUrl,{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email}),
-    })
-
-    return response;
-}
-
-export const VerifyOtp = async(data: { email: string, otp: string }) => {
-    const response = await fetch(verifyOtpUrl,{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
+    console.log(response)
 
     return response;
 }

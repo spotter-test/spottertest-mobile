@@ -111,10 +111,8 @@ const FlightCard = ({ data }: any) => {
                     style={styles.bookButton}
                     onPress={() => {
                         if (token) {
-                        // ✅ User is logged in → open booking link
                         Linking.openURL(bestPrice.agents[0].url);
                         } else {
-                        // 🚨 Show alert first
                         Alert.alert(
                             'Login Required',
                             'You need to log in before booking this flight.',

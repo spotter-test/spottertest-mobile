@@ -1,18 +1,20 @@
 // app/index.tsx
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, ActivityIndicator } from 'react-native';
+
 
 export default function Index() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-  const [isLoggedIn,setIsLoggedIn] = useState('false')
+ 
 
   useEffect(() => {
-
     const checkLogin = async () => {
-      
-      // Delay for splash if you want
+      const isLoggedIn = await AsyncStorage.getItem('firstLogin');
+
+
       await new Promise(res => setTimeout(res, 200));
 
       if (isLoggedIn === 'true') {
@@ -21,9 +23,7 @@ export default function Index() {
         router.replace('/welcome');
       }
 
-      setTimeout(() => {
-        setChecking(false);
-      },2000)
+      setChecking(false);
     };
 
     checkLogin();

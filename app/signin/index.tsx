@@ -1,20 +1,72 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Toast from 'react-native-toast-message';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import Validationerror from '@/components/Validationerror';
+import { useAuth } from '@/hooks/useAuth';
+import CustomeButtom from '@/components/CustomeButtom';
+import { storeToken,setFirstLogin } from '@/utils/token';
+
 
 export default function index() {
     const router = useRouter();
+    const {LoginUser} = useAuth();
+  const [error,setError] = useState('');
+  const [isLoading,setIsLoading] = useState(false);
+  const formData = useFormik({
+    initialValues: {
+      email: '',
+      password: ''
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+       .email('Invalid email')
+       .required('Email is required'),
+      password: Yup.string()
+       .min(6, 'Password must be at least 6 characters long')
+       .required('Password is required')
+    }),
+    onSubmit: async(values) => {
+      setIsLoading(true);
+      const response = await LoginUser(values);
+      console.log(response);
+      if(response.status != 'success'){
+        setIsLoading(false);
+        setTimeout(() => {
+
+        },1500);
+        setError(response.message);
+      } else {
+        setIsLoading(false);
+        setError('');
+        await storeToken(response.token)
+        await setFirstLogin();
+        router.push('/(tabs)');
+      }
+      
+      // TODO: Send the form data to the server
+    }
+  })
+  const [showPassword,setShowPassword] = useState(false);
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -39,33 +91,57 @@ export default function index() {
 
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
+              style={[styles.input,{padding: 21}]}
               placeholder="Email or Phone number"
               placeholderTextColor="#A9A9A9"
               keyboardType="email-address"
               autoCapitalize="none"
+              onChangeText={formData.handleChange('email')}
+              onBlur={formData.handleBlur('email')}
             />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="#A9A9A9"
-              secureTextEntry={true}
-            />
-
-            <TouchableOpacity
-                onPress={() => router.push('/forgotpassword')}
+            {
+              formData.touched.email && formData.errors.email && (<Validationerror title={formData.errors.email}/>)
+            }
+            
+            <View
+                style={[styles.input,{marginTop: 20}]}
             >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
+                <TextInput
+                    style={{
+                        width: '90%'
+                    }}
+                    placeholder="Password"
+                    placeholderTextColor="#A9A9A9"
+                    secureTextEntry={!showPassword}
+                    onChangeText={formData.handleChange('password')}
+                    onBlur={formData.handleBlur('password')}
+                />
+                <TouchableOpacity 
+                    onPress={toggleShowPassword} 
+                    style={{
+                        
+                    }}
+                >
+                    <Ionicons
+                        name={showPassword ? 'eye-off' : 'eye'}  // swap icons
+                        size={22}
+                        color="#888"
+                    />
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push('/(tabs)')}
-            >
-              <Text style={styles.buttonText}>Sign in</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+            {
+              formData.touched.password && formData.errors.password && (<Validationerror title={formData.errors.password}/>)
+            }
+
+            <View style={{width: 100, marginTop: 100}}/>
+                <CustomeButtom 
+                    title="Login" 
+                    onPress={formData.handleSubmit}
+                    isLoading={isLoading}
+                    color={'#007AFF'}
+                />
+            </View>
 
           
           <View style={styles.resendContainer}>
@@ -111,10 +187,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f3f8ff', // A light lavender color
     borderRadius: 15,
     padding: 18,
-    fontSize: 16,
     marginBottom: 20,
     color: '#333',
-    fontFamily: 'PlusJakarta-Regular'
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   forgotPasswordText: {
     color: '#555',
