@@ -20,6 +20,7 @@ import Validationerror from '@/components/Validationerror';
 import { useAuth } from '@/hooks/useAuth';
 import CustomeButtom from '@/components/CustomeButtom';
 import { storeToken,setFirstLogin } from '@/utils/token';
+import { useLocalSearchParams } from 'expo-router';
 
 
 export default function index() {
@@ -27,6 +28,15 @@ export default function index() {
     const {LoginUser} = useAuth();
   const [error,setError] = useState('');
   const [isLoading,setIsLoading] = useState(false);
+  const { ref,previous } = useLocalSearchParams();
+
+   const handleGoBack = () => {
+     if(previous == 'logout'){
+     }else {
+       router.back();
+     }
+   };
+
   const formData = useFormik({
     initialValues: {
       email: '',
@@ -81,7 +91,7 @@ export default function index() {
           }}
         >
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => handleGoBack()}>
                 <AntDesign name="left" size={24} color="black" />
               </TouchableOpacity>
             <Text style={styles.headerTitle}>Sign In</Text>

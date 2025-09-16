@@ -19,11 +19,15 @@ import ModalPopup from '@/components/ModalPopup';
 import CustomeButtom from '@/components/CustomeButtom';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logout } from '@/utils/api';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 
 const index = () => {
   const [logoutModal,setLogoutModal] = React.useState(false);
   const [deleteaccountModal,setDeleteAccountModal] = React.useState(false);
+
+  const navigation = useNavigation<StackNavigationProp<any>>();
   
   return (
     <SafeAreaView style={styles.container}>
@@ -281,7 +285,13 @@ const index = () => {
                     onPress={() => {
                       setLogoutModal(false)
                       logout()
-                      router.push('/signin')
+                       router.replace({
+                          pathname: '/signin',
+                          params: {
+                            ref: 'signin',
+                            previous: 'logout'
+                          }
+                      });
                     }}
                     color={'#1280ED'}
                   />
