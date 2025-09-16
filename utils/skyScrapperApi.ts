@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 
 
 const API_HOST = "sky-scrapper.p.rapidapi.com";
-const API_KEY = "2933842811mshe0127a23cae25bdp1c22bfjsnf647341053e8";
+const API_KEY = "0538a66411msh84a55eb123b3df6p16226ejsn0651b328ce00";
 const apiurl = 'https://sky-scrapper.p.rapidapi.com/api/v1/flights'
 const apiurl2 = 'https://sky-scrapper.p.rapidapi.com/api/v2/flights'
 

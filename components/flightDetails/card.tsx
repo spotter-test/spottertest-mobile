@@ -1,25 +1,28 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity,Linking,Alert } from 'react-native'
-import React,{useState,useEffect} from 'react'
-import { useRouter } from 'expo-router';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Linking, Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getToken } from '@/utils/token';
+import { Ionicons } from '@expo/vector-icons';
 
-const FlightCard = ({ data }: any) => {
+const Flightcard = ({data}: any) => {
     const router = useRouter();
-    console.log(data);
-    const itinerary = data.data.itinerary;
-    const legs = itinerary.legs;
-    const pricingOptions = itinerary.pricingOptions;
+    const params = useLocalSearchParams();
+    const [token, setToken] = useState('');
+    const [flightData, setFlightData] = useState<any>(null);
 
-    const [token,setToken] = useState();
-    
-      const GetToken = async() => {
+    // Parse flight data from params
+    useEffect(() => {
+         setFlightData(data);
+    }, []);
+
+    const GetToken = async () => {
         const _token: any = await getToken();
         setToken(_token);
-      }
-    
-      useEffect(() => {
+    }
+
+    useEffect(() => {
         GetToken();
-      },[])
+    }, []);
 
     // Format duration from minutes to hours and minutes
     const formatDuration = (minutes: number) => {
@@ -31,258 +34,432 @@ const FlightCard = ({ data }: any) => {
     // Format date and time
     const formatDateTime = (dateTimeString: string) => {
         const date = new Date(dateTimeString);
-        return date.toLocaleString();
+        return {
+            date: date.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+            }),
+            time: date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            })
+        };
     };
 
-    // Find the best price
-    const bestPrice = pricingOptions.reduce((min: any, option: any) => 
-        option.totalPrice < min.totalPrice ? option : min, pricingOptions[0]
-    );
+    const handleBookNow = () => {
+        if (token) {
+            // In a real app, you'd have a booking URL from the API
+            Linking.openURL('https://www.skyscanner.com');
+        } else {
+            Alert.alert(
+                'Login Required',
+                'You need to log in before booking this flight.',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Login', onPress: () => router.push('/signin') },
+                ]
+            );
+        }
+    };
+
+    if (!flightData) {
+        return (
+            <View style={styles.loadingContainer}>
+                <Text>Loading flight details...</Text>
+            </View>
+        );
+    }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                {/* Flight Route Summary */}
-                <View style={styles.routeSummary}>
-                    <Text style={styles.routeText}>
-                        {legs[0].origin.city} ({legs[0].origin.displayCode}) → 
-                        {legs[0].destination.city} ({legs[0].destination.displayCode})
-                    </Text>
-                    <Text style={styles.priceText}>From ${bestPrice.totalPrice}</Text>
-                </View>
+        <ScrollView style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Flight Details</Text>
+                <View style={{ width: 24 }} />
+            </View>
 
-                {/* Flight Details */}
-                {legs.map((leg: any) => (
-                    <View key={leg.id} style={styles.legContainer}>
-                        <View style={styles.airlineContainer}>
-                            <Image
-                                source={{ uri: leg.segments[0].marketingCarrier.logo }}
-                                style={styles.airlineLogo}
-                            />
+            {/* Price Summary */}
+            <View style={styles.priceSummary}>
+                <Text style={styles.price}>{flightData.price.formatted}</Text>
+                <Text style={styles.priceSubtext}>Total price per person</Text>
+            </View>
+
+            {/* Flight Legs */}
+            {flightData.legs.map((leg: any, index: number) => (
+                <View key={leg.id} style={styles.legContainer}>
+                    <Text style={styles.legTitle}>
+                        {index === 0 ? 'Outbound' : 'Return'} Flight
+                    </Text>
+                    
+                    {/* Airline Info */}
+                    <View style={styles.airlineInfo}>
+                        <Image
+                            source={{ uri: leg.carriers.marketing[0].logoUrl }}
+                            style={styles.airlineLogo}
+                        />
+                        <View>
                             <Text style={styles.airlineName}>
-                                {leg.segments[0].marketingCarrier.name}
+                                {leg.carriers.marketing[0].name}
                             </Text>
                             <Text style={styles.flightNumber}>
                                 Flight {leg.segments[0].flightNumber}
                             </Text>
                         </View>
+                    </View>
 
-                        <View style={styles.timeContainer}>
-                            <View style={styles.timeBlock}>
-                                <Text style={styles.time}>{formatDateTime(leg.departure).split(', ')[1]}</Text>
-                                <Text style={styles.airportCode}>{leg.origin.displayCode}</Text>
-                                <Text style={styles.date}>{formatDateTime(leg.departure).split(', ')[0]}</Text>
-                            </View>
-
-                            <View style={styles.durationContainer}>
-                                <Text style={styles.duration}>{formatDuration(leg.duration)}</Text>
-                                <View style={styles.flightLine}>
-                                    <View style={styles.line} />
-                                    <Text>✈️</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.timeBlock}>
-                                <Text style={styles.time}>{formatDateTime(leg.arrival).split(', ')[1]}</Text>
-                                <Text style={styles.airportCode}>{leg.destination.displayCode}</Text>
-                                <Text style={styles.date}>{formatDateTime(leg.arrival).split(', ')[0]}</Text>
-                            </View>
+                    {/* Flight Route */}
+                    <View style={styles.routeContainer}>
+                        <View style={styles.timeBlock}>
+                            <Text style={styles.time}>
+                                {formatDateTime(leg.departure).time}
+                            </Text>
+                            <Text style={styles.airportCode}>
+                                {leg.origin.displayCode}
+                            </Text>
+                            <Text style={styles.airportName}>
+                                {leg.origin.name}
+                            </Text>
+                            <Text style={styles.date}>
+                                {formatDateTime(leg.departure).date}
+                            </Text>
                         </View>
 
-                        <View style={styles.airportInfo}>
-                            <Text style={styles.airportName}>{leg.origin.name}</Text>
-                            <Text style={styles.airportName}>{leg.destination.name}</Text>
+                        <View style={styles.durationContainer}>
+                            <Text style={styles.duration}>
+                                {formatDuration(leg.durationInMinutes)}
+                            </Text>
+                            <View style={styles.flightLine}>
+                                <View style={styles.line} />
+                                <Ionicons name="airplane" size={16} color="#666" />
+                            </View>
+                            <Text style={styles.stopInfo}>
+                                {leg.stopCount === 0 ? 'Non-stop' : `${leg.stopCount} stop${leg.stopCount > 1 ? 's' : ''}`}
+                            </Text>
+                        </View>
+
+                        <View style={styles.timeBlock}>
+                            <Text style={styles.time}>
+                                {formatDateTime(leg.arrival).time}
+                            </Text>
+                            <Text style={styles.airportCode}>
+                                {leg.destination.displayCode}
+                            </Text>
+                            <Text style={styles.airportName}>
+                                {leg.destination.name}
+                            </Text>
+                            <Text style={styles.date}>
+                                {formatDateTime(leg.arrival).date}
+                            </Text>
                         </View>
                     </View>
-                ))}
 
-                {/* Pricing Options */}
-                <View style={styles.pricingContainer}>
-                    <Text style={styles.pricingTitle}>Available from:</Text>
-                    {pricingOptions.map((option: any, index: number) => (
-                        <View key={index} style={styles.priceOption}>
-                            <Text style={styles.agentName}>{option.agents[0].name}</Text>
-                            <Text style={styles.agentPrice}>${option.totalPrice}</Text>
+                    {/* Flight Details */}
+                    <View style={styles.detailsContainer}>
+                        <View style={styles.detailItem}>
+                            <Ionicons name="time-outline" size={16} color="#666" />
+                            <Text style={styles.detailText}>
+                                Duration: {formatDuration(leg.durationInMinutes)}
+                            </Text>
                         </View>
-                    ))}
+                        <View style={styles.detailItem}>
+                            <Ionicons name="business-outline" size={16} color="#666" />
+                            <Text style={styles.detailText}>
+                                Operated by: {leg.segments[0].operatingCarrier.name}
+                            </Text>
+                        </View>
+                    </View>
                 </View>
+            ))}
 
-                {/* Book Button */}
-                <TouchableOpacity 
-                    style={styles.bookButton}
-                    onPress={() => {
-                        if (token) {
-                        Linking.openURL(bestPrice.agents[0].url);
-                        } else {
-                        Alert.alert(
-                            'Login Required',
-                            'You need to log in before booking this flight.',
-                            [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Login', onPress: () => router.push('/signin') },
-                            ]
-                        );
-                        }
-                    }}
-                >
-                    <Text style={styles.bookButtonText}>Book Now ${bestPrice.totalPrice}</Text>
-                </TouchableOpacity>
+            {/* Fare Policy */}
+            <View style={styles.policyContainer}>
+                <Text style={styles.sectionTitle}>Fare Policy</Text>
+                <View style={styles.policyItem}>
+                    <Ionicons 
+                        name={flightData.farePolicy.isChangeAllowed ? "checkmark-circle" : "close-circle"} 
+                        size={20} 
+                        color={flightData.farePolicy.isChangeAllowed ? "#4CAF50" : "#F44336"} 
+                    />
+                    <Text style={styles.policyText}>
+                        Change allowed: {flightData.farePolicy.isChangeAllowed ? 'Yes' : 'No'}
+                    </Text>
+                </View>
+                <View style={styles.policyItem}>
+                    <Ionicons 
+                        name={flightData.farePolicy.isCancellationAllowed ? "checkmark-circle" : "close-circle"} 
+                        size={20} 
+                        color={flightData.farePolicy.isCancellationAllowed ? "#4CAF50" : "#F44336"} 
+                    />
+                    <Text style={styles.policyText}>
+                        Cancellation allowed: {flightData.farePolicy.isCancellationAllowed ? 'Yes' : 'No'}
+                    </Text>
+                </View>
             </View>
-        </View>
-    )
-}
 
-export default FlightCard
+            {/* Tags */}
+            {flightData.tags && flightData.tags.length > 0 && (
+                <View style={styles.tagsContainer}>
+                    <Text style={styles.sectionTitle}>Features</Text>
+                    <View style={styles.tagsRow}>
+                        {flightData.tags.map((tag: string, index: number) => (
+                            <View key={index} style={styles.tag}>
+                                <Text style={styles.tagText}>
+                                    {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            )}
+
+            {/* Book Button */}
+            <TouchableOpacity 
+                style={styles.bookButton}
+                onPress={handleBookNow}
+            >
+                <Text style={styles.bookButtonText}>
+                    Book Now - {flightData.price.formatted}
+                </Text>
+            </TouchableOpacity>
+        </ScrollView>
+    );
+};
+
+export default Flightcard;
 
 const styles = StyleSheet.create({
     container: {
-        flex:1,
-        marginTop: 10
+        flex: 1,
+        backgroundColor: '#F8F9FA',
     },
-    card: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        width: '100%',
-        borderRadius: 12,
-        padding: 16,
-        backgroundColor: 'white'
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F8F9FA',
     },
-    routeSummary: {
-        flexDirection: 'column',
+    header: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
-        paddingBottom: 12,
+        padding: 16,
+        backgroundColor: '#FFF',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee'
+        borderBottomColor: '#EEE',
     },
-    routeText: {
-        fontWeight: '600',
-        fontSize: 16,
-        color: '#333'
+    backButton: {
+        padding: 4,
     },
-    priceText: {
-        fontWeight: '700',
+    headerTitle: {
         fontSize: 18,
-        color: '#007AFF'
+        fontWeight: '600',
+        color: '#000',
+    },
+    priceSummary: {
+        backgroundColor: '#FFF',
+        padding: 20,
+        alignItems: 'center',
+        margin: 16,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    price: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#007AFF',
+    },
+    priceSubtext: {
+        fontSize: 14,
+        color: '#666',
+        marginTop: 4,
     },
     legContainer: {
-        marginBottom: 20
+        backgroundColor: '#FFF',
+        margin: 16,
+        padding: 20,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
-    airlineContainer: {
+    legTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1A1A1A',
+        marginBottom: 16,
+    },
+    airlineInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
-        gap: 8
+        marginBottom: 20,
     },
     airlineLogo: {
-        width: 24,
-        height: 24,
-        borderRadius: 12
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 12,
     },
     airlineName: {
-        fontWeight: '500',
-        fontSize: 14,
-        color: '#666'
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
     },
     flightNumber: {
-        fontWeight: '400',
-        fontSize: 12,
-        color: '#999'
+        fontSize: 14,
+        color: '#666',
     },
-    timeContainer: {
+    routeContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12
+        marginBottom: 20,
     },
     timeBlock: {
         alignItems: 'center',
-        flex: 1
+        flex: 1,
     },
     time: {
+        fontSize: 18,
         fontWeight: '600',
-        fontSize: 16,
-        color: '#333'
+        color: '#333',
+        marginBottom: 4,
     },
     airportCode: {
-        fontWeight: '700',
-        fontSize: 18,
-        color: '#000'
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#000',
+        marginBottom: 2,
+    },
+    airportName: {
+        fontSize: 12,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 4,
     },
     date: {
-        fontWeight: '400',
         fontSize: 12,
-        color: '#666'
+        color: '#888',
     },
     durationContainer: {
         alignItems: 'center',
-        flex: 2
+        flex: 2,
     },
     duration: {
+        fontSize: 14,
         fontWeight: '500',
-        fontSize: 12,
         color: '#666',
-        marginBottom: 4
+        marginBottom: 8,
     },
     flightLine: {
         flexDirection: 'row',
         alignItems: 'center',
-        width: '100%'
+        width: '100%',
+        marginBottom: 8,
     },
     line: {
         flex: 1,
-        height: 1,
-        backgroundColor: '#ddd'
+        height: 2,
+        backgroundColor: '#DDD',
     },
-    airportInfo: {
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    airportName: {
-        fontWeight: '400',
+    stopInfo: {
         fontSize: 12,
         color: '#666',
-        flex: 1
     },
-    pricingContainer: {
-        marginTop: 16,
-        paddingTop: 12,
+    detailsContainer: {
         borderTopWidth: 1,
-        borderTopColor: '#eee'
+        borderTopColor: '#EEE',
+        paddingTop: 16,
     },
-    pricingTitle: {
-        fontWeight: '600',
-        fontSize: 14,
-        color: '#333',
-        marginBottom: 8
-    },
-    priceOption: {
+    detailItem: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 6
+        marginBottom: 8,
     },
-    agentName: {
-        fontWeight: '400',
+    detailText: {
         fontSize: 14,
-        color: '#666'
+        color: '#666',
+        marginLeft: 8,
     },
-    agentPrice: {
+    policyContainer: {
+        backgroundColor: '#FFF',
+        margin: 16,
+        padding: 20,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    sectionTitle: {
+        fontSize: 18,
         fontWeight: '600',
+        color: '#1A1A1A',
+        marginBottom: 16,
+    },
+    policyItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    policyText: {
         fontSize: 14,
-        color: '#333'
+        color: '#666',
+        marginLeft: 8,
+    },
+    tagsContainer: {
+        backgroundColor: '#FFF',
+        margin: 16,
+        padding: 20,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    tagsRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    tag: {
+        backgroundColor: '#E3F2FD',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    tagText: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: '#1976D2',
     },
     bookButton: {
         backgroundColor: '#007AFF',
-        padding: 16,
-        borderRadius: 8,
+        margin: 16,
+        padding: 20,
+        borderRadius: 12,
         alignItems: 'center',
-        marginTop: 16
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     bookButtonText: {
-        color: 'white',
+        color: '#FFF',
+        fontSize: 18,
         fontWeight: '600',
-        fontSize: 16
-    }
+    },
 });

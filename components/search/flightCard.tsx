@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 
-const FlightCard = ({ data,adults,currency,locale,market,cabinClass,countryCode }: any) => {
+const FlightCard = ({ data}: any) => {
     const router = useRouter();
     const firstLeg = data.legs[0];
     const airline = firstLeg.carriers.marketing[0];
@@ -13,13 +13,7 @@ const FlightCard = ({ data,adults,currency,locale,market,cabinClass,countryCode 
             onPress={() => router.push({
                 pathname: '/flightDetails',
                 params: { 
-                    legs: data.legs, 
-                    adults, 
-                    currency, 
-                    locale, 
-                    market, 
-                    cabinClass, 
-                    countryCode 
+                    data: JSON.stringify(data)
                 }
             })}
         >
