@@ -27,6 +27,7 @@ export default function RootLayout() {
         <Stack.Screen name='signin'/>
         <Stack.Screen name="profilePassword" />
         <Stack.Screen name="profileInfo" />
+        <Stack.Screen name="homeFlightDetails" />
 
        
       </Stack>

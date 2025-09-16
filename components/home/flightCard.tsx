@@ -17,7 +17,22 @@ const FlightCard = ({data}: any) => {
    <TouchableOpacity 
       style={{ padding: 12,marginTop: 10 }}
       onPress={() => {
-        router.push('/flightDetails')
+        router.push({
+          pathname: '/homeFlightDetails',
+          params: {
+            legs: JSON.stringify([{
+              destination: "LOND",
+              origin: "LAXA", 
+              date: "2024-04-11"
+            }]),
+            adults: "",
+            currency: "USD",
+            locale: "en-US",
+            market: "en-US",
+            cabinClass: "",
+            countryCode: "US"
+          }
+        })
       }}
     >
       <Image
