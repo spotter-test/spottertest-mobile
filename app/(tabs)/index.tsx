@@ -53,10 +53,10 @@ const index = () => {
 
   // }
 
-  useEffect(() => {
-    // fetchFlights();
+  // useEffect(() => {
+  //   fetchFlights();
 
-  },[]);
+  // },[]);
 
   
   return (

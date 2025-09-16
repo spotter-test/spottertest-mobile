@@ -20,17 +20,7 @@ const FlightCard = ({data}: any) => {
         router.push({
           pathname: '/homeFlightDetails',
           params: {
-            legs: JSON.stringify([{
-              destination: "LOND",
-              origin: "LAXA", 
-              date: "2024-04-11"
-            }]),
-            adults: "",
-            currency: "USD",
-            locale: "en-US",
-            market: "en-US",
-            cabinClass: "",
-            countryCode: "US"
+            locationdata: JSON.stringify(data)
           }
         })
       }}

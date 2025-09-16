@@ -13,45 +13,9 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 const FlightLocationScreen = () => {
-  const params = useLocalSearchParams();
-  
-  // Sample data structure (you would get this from your API/params)
-  const locationData = {
-    "id": "location-29475259",
-    "type": "LOCATION",
-    "content": {
-      "location": {
-        "id": "29475259",
-        "skyCode": "AL",
-        "name": "Albania",
-        "type": "Nation",
-        "continent": {
-          "code": "EU",
-          "name": "Europe"
-        }
-      },
-      "flightQuotes": {
-        "cheapest": {
-          "price": "$18",
-          "rawPrice": 18,
-          "direct": true
-        },
-        "direct": {
-          "price": "$18",
-          "rawPrice": 18,
-          "direct": true
-        }
-      },
-      "image": {
-        "url": "https://content.skyscnr.com/d4acb8b30e8cfcb36db339ce50fd23ae/GettyImages-485428808.jpg"
-      },
-      "flightRoutes": {
-        "directFlightsAvailable": true
-      }
-    }
-  };
-
-  const { content } = locationData;
+  const params: any = useLocalSearchParams();
+  const locationData = JSON.parse(params.locationdata);
+  const { content }: any = locationData;
   const { location, flightQuotes, image, flightRoutes } = content;
 
   return (
@@ -64,7 +28,7 @@ const FlightLocationScreen = () => {
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Flight Details</Text>
-        <View style={{ width: 24 }} /> {/* Spacer for balance */}
+        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -85,8 +49,9 @@ const FlightLocationScreen = () => {
             </View>
             <View style={styles.detailRow}>
               <Ionicons name="earth-outline" size={20} color="#666" />
+              {/* FIXED: Removed nested Text */}
               <Text style={styles.detailText}>
-                {location.continent.name} <Text>{location.continent.code}</Text>
+                {location.continent.name} ({location.continent.code})
               </Text>
             </View>
             <View style={styles.detailRow}>
@@ -105,6 +70,7 @@ const FlightLocationScreen = () => {
               <Ionicons name="pricetag-outline" size={20} color="#4CAF50" />
               <Text style={styles.priceLabel}>Cheapest</Text>
               <Text style={styles.priceValue}>{flightQuotes.cheapest.price}</Text>
+              {/* FIXED: Use string instead of nested Text */}
               <Text style={styles.priceSubtext}>
                 {flightQuotes.cheapest.direct ? 'Direct' : 'With stops'}
               </Text>
@@ -116,6 +82,7 @@ const FlightLocationScreen = () => {
               <Ionicons name="rocket-outline" size={20} color="#2196F3" />
               <Text style={styles.priceLabel}>Direct</Text>
               <Text style={styles.priceValue}>{flightQuotes.direct.price}</Text>
+              {/* FIXED: Use string instead of nested Text */}
               <Text style={styles.priceSubtext}>
                 {flightQuotes.direct.direct ? 'Non-stop' : 'Multiple stops'}
               </Text>
@@ -132,6 +99,7 @@ const FlightLocationScreen = () => {
               size={24} 
               color={flightRoutes.directFlightsAvailable ? "#4CAF50" : "#F44336"} 
             />
+            {/* FIXED: Use string interpolation instead of nested Text */}
             <Text style={styles.availabilityText}>
               Direct flights {flightRoutes.directFlightsAvailable ? 'available' : 'not available'}
             </Text>
@@ -168,6 +136,7 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: 250,
+    backgroundColor: '#d3dde6ff'
   },
   card: {
     backgroundColor: '#FFF',
