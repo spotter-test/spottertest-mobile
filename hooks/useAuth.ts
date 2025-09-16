@@ -21,8 +21,7 @@ export const useAuth = () => {
     }
 
     const UpdatePassword = async(data: any) => {
-       const {email, password} = data;
-        const response = await updatePassword(email,password)
+        const response = await updatePassword(data);
         const responseData = await response.json();
         return responseData;
     }

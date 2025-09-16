@@ -17,17 +17,18 @@ import {
 
   import { router,useLocalSearchParams } from 'expo-router';
   import AntDesign from '@expo/vector-icons/AntDesign';
-//   import Validationerror from '@/components/Validationerror';
+  import Validationerror from '@/components/Validationerror';
   import * as Yup from 'yup';
   import { useFormik } from 'formik';
-//   import { useAuth } from '@/hooks/useAuth';
+  import { useAuth } from '@/hooks/useAuth';
   import Toast from 'react-native-toast-message';
   import ModalPopup from '@/components/ModalPopup';
   
   const index = () => {
     const {email,previous_screen} = useLocalSearchParams();
     const [showPassword,setShowPassword] = useState(false);
-    // const {UpdatePassword} = useAuth();
+    const [loading,setLoading] = useState(false);
+    const {UpdatePassword} = useAuth();
     const [visible,setVisible] = useState(false);
     
     const formData = useFormik({
@@ -37,11 +38,16 @@ import {
       },
       validationSchema: Yup.object({}),
       onSubmit: async(values) => {  
-        setVisible(true);
-        // const response = await UpdatePassword({
-        //   email,
-        //   password: values.password
-        // })
+        // setVisible(true);
+        if (!values.password || !values.confirmPassword) {
+          alert('Please fill in both password fields');
+          return; // Stop execution
+        }
+        const response = await UpdatePassword({
+          currentPassword: values.password,
+          newPassword: values.confirmPassword
+        })
+        console.log(response)
         // if(response.statusCode == 200){
         
         // }
@@ -90,13 +96,13 @@ import {
             >
                 <Text
                   style={styles.loginTextHeader}
-                > Password </Text>
+                > Current Password </Text>
                 <View 
                   style={styles.loginContainerText}
                 >
                   <TextInput
                       id='password'
-                      placeholder="Enter Password"
+                      placeholder="Enter Current Password"
                       keyboardType="default"
                       style={styles.loginInput}
                       secureTextEntry={!showPassword}
@@ -121,13 +127,13 @@ import {
                 >
                 <Text
                   style={styles.loginTextHeader}
-                > Confirm Password </Text>
+                > New Password </Text>
                 <View 
                   style={styles.loginContainerText}
                 >
                   <TextInput
                       id='confirmpassword'
-                      placeholder="Confirm Password"
+                      placeholder="New Password"
                       keyboardType="default"
                       style={styles.loginInput}
                       secureTextEntry={!showPassword}
@@ -152,6 +158,7 @@ import {
                   title="Change password" 
                   onPress={formData.handleSubmit}
                   color={'#1280ED'}
+                  isLoading={loading}
                 />
               </View>
               <ModalPopup 

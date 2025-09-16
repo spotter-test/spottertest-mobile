@@ -26,15 +26,18 @@ export const getUser = async() => {
     }
 }
 
-export const updatePassword = async(email:string,password:string) => {
+export const updatePassword = async(data: any) => {
+    const {currentPassword,newPassword} = data;
+    const token = await getToken();
     const response = await fetch(updatePasswordUrl,{
-        method: 'post',
+        method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-            email,
-            password
+            currentPassword,
+            newPassword
         })
     })
 
