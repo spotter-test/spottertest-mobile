@@ -18,6 +18,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import ModalPopup from '@/components/ModalPopup';
 import CustomeButtom from '@/components/CustomeButtom';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { logout } from '@/utils/api';
 
 
 const index = () => {
@@ -233,25 +234,16 @@ const index = () => {
                 }}
               />
             </View>
-            <View
-              style={{
-                width: '100%',
-                backgroundColor: '#F1F1F1',
-                height: '23%',
-                marginBottom: '5%',
-                marginTop: '5%',
-                borderRadius: '5%',
-                paddingLeft: '4%',
-                paddingTop: '3%'
-              }}
-            >
-              <View>
-                <TouchableOpacity
+            <TouchableOpacity
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    marginBottom: '3%'
+                    marginTop: 100,
+                    borderWidth: 1,
+                    padding: 20,
+                    borderRadius: 10,
+                    borderColor: '#1280ED'
                   }}
                   onPress={() => setLogoutModal(true)}
                 >
@@ -266,40 +258,6 @@ const index = () => {
                     Logout
                   </Text>
                 </TouchableOpacity>
-              </View>
-              <View 
-                style={{
-                  width: '100%',
-                  borderWidth: 0.5,
-                  opacity: 0.2,
-                  marginTop: '2%'
-                }}
-              />
-              <View
-              >
-                <TouchableOpacity
-                   style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginTop: '3%'
-                  }}
-                  onPress={() => setDeleteAccountModal(true)}
-                >
-                  <MaterialIcons name="delete-outline" size={24} color="#C62121" />
-                  <Text 
-                    style={{
-                      color: '#C62121',
-                      fontSize: 18,
-                      marginLeft: '5%'
-                    }}
-                  >
-                    Delete Account
-                  </Text>
-                </TouchableOpacity>
-
-              </View>
-            </View>
           </View> 
           <ModalPopup 
                 visible={logoutModal}
@@ -320,7 +278,11 @@ const index = () => {
                 >
                   <CustomeButtom 
                     title='Yes'
-                    onPress={() => setLogoutModal(false)}
+                    onPress={() => {
+                      setLogoutModal(false)
+                      logout()
+                      router.push('/signin')
+                    }}
                     color={'#1280ED'}
                   />
                   <CustomeButtom 

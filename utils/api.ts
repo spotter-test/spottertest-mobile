@@ -5,7 +5,7 @@ import {
     updatePasswordUrl,
     getUserUrl
 } from "./endpoints";
-import { getToken } from "./token";
+import { getToken,clearFirstLogin,removeToken } from "./token";
  
 
 export const getUser = async() => {
@@ -87,4 +87,10 @@ export const UpdateUserData = async(data: any) => {
 
 
     return response;
+}
+
+export const logout = async() => {
+    clearFirstLogin();
+    removeToken();
+    
 }
