@@ -45,17 +45,17 @@ export const updatePassword = async(data: any) => {
 }
 
 export const SignUp = async(data: any) => {
+    console.log(data)
     const response = await fetch(signUpUrl,{
         method: 'post',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            firstname: data.firstname,
-            lastname: data.lastname,
+            firstName: data.firstName,
+            lastName: data.lastName,
             email: data.email,
             password: data.password,
-            phonenumber: data.phonenumber
         }),
     })
 

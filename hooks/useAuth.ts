@@ -27,14 +27,8 @@ export const useAuth = () => {
     }
 
     const CreateAccount = async(data: any) => {
-        const {email,firstname,lastname,password,phonenumber} = data;
-        const response: any = await SignUp({
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            password: password,
-            phonenumber: phonenumber
-        });
+        const {email,firstName,lastName,password} = data;
+        const response: any = await SignUp(data);
         const responseData = await response.json();
         return responseData;
     }

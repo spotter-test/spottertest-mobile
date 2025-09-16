@@ -23,7 +23,7 @@ import { useLocalSearchParams } from 'expo-router';
 
 export default function index() {
     const router = useRouter();
-    const {LoginUser} = useAuth();
+    const {CreateAccount} = useAuth();
     const [error,setError] = useState('');
     const [isLoading,setIsLoading] = useState(false);
 
@@ -45,11 +45,12 @@ export default function index() {
             .required('Firstname is required'),
           lastName: Yup.string()
             .required('Lastname is required')
-          
         }),
         onSubmit: async(values) => {
+          console.log(values);
           setIsLoading(true);
-          const response = await LoginUser(values);
+          const response = await CreateAccount(values);
+          console.log(response);
           if(response.status != 'success'){
             setIsLoading(false);
             setTimeout(() => {
@@ -99,8 +100,8 @@ export default function index() {
               style={[styles.input,{marginTop: 20}]}
               placeholder="First Name"
               placeholderTextColor="#A9A9A9"
-              keyboardType="email-address"
-              autoCapitalize="none"
+              value={formData.values.firstName} 
+              autoCapitalize="words"
               onChangeText={formData.handleChange('firstName')}
               onBlur={formData.handleBlur('firstName')}
             />
@@ -112,8 +113,8 @@ export default function index() {
               style={[styles.input,{marginTop: 20}]}
               placeholder="Last Name"
               placeholderTextColor="#A9A9A9"
-              keyboardType="email-address"
-              autoCapitalize="none"
+              value={formData.values.lastName} 
+              autoCapitalize="words"
               onChangeText={formData.handleChange('lastName')}
               onBlur={formData.handleBlur('lastName')}
             />
