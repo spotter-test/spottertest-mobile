@@ -56,9 +56,6 @@ export default function index() {
       console.log(response);
       if(response.status != 'success'){
         setIsLoading(false);
-        setTimeout(() => {
-
-        },1500);
         setError(response.message);
       } else {
         setIsLoading(false);

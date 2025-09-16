@@ -50,8 +50,13 @@ const Flightcard = ({data}: any) => {
 
     const handleBookNow = () => {
         if (token) {
-            // In a real app, you'd have a booking URL from the API
-            Linking.openURL('https://www.skyscanner.com');
+             Alert.alert(
+                'getFlightsDetails endpoint deprecated',
+                'wendpoint not working',
+                [
+                    { text: 'Cancel', style: 'cancel' }
+                ]
+            );
         } else {
             Alert.alert(
                 'Login Required',
@@ -75,13 +80,13 @@ const Flightcard = ({data}: any) => {
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
-            <View style={styles.header}>
+            {/* <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Flight Details</Text>
                 <View style={{ width: 24 }} />
-            </View>
+            </View> */}
 
             {/* Price Summary */}
             <View style={styles.priceSummary}>

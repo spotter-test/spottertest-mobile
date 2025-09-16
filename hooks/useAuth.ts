@@ -36,9 +36,7 @@ export const useAuth = () => {
     const LoginUser = async(data:any) => {
         const response = await Login(data);
         const responseData = await response.json();
-        if(responseData.statusCode == 200) {
-            storeToken(responseData.token);
-        } 
+        
         return responseData;
     }
 

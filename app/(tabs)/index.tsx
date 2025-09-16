@@ -43,20 +43,20 @@ const index = () => {
   
   const [subFlights,setSubFlights] = useState<any>([])
 
-  // const fetchFlights = async() => {
-  //   const originData: any = await searchAirports('london');
+  const fetchFlights = async() => {
+    const originData: any = await searchAirports('london');
 
-  //   const originEntityId = originData.data[0].entityId;
+    const originEntityId = originData.data[0].entityId;
 
-  //   const fetch = await searchFlightEveryWhere(originEntityId);
-  //   setFlights(fetch.data.results)
+    const fetch = await searchFlightEveryWhere(originEntityId);
+    setFlights(fetch.data.results)
 
-  // }
+  }
 
-  // useEffect(() => {
-  //   fetchFlights();
+  useEffect(() => {
+    fetchFlights();
 
-  // },[]);
+  },[]);
 
   
   return (
@@ -124,7 +124,7 @@ const index = () => {
               <Text style={styles.flightsHeaderText}> Flights</Text>
               <View>
                 {
-                  results.map((r) => (
+                  flights.map((r) => (
                     <FlightCard key={r.id} data={r}/>
                   ))
                 }
