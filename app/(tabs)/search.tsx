@@ -18,15 +18,14 @@ import {
   Keyboard
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React,{useState,useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons,AntDesign, Fontisto,MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, AntDesign, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useRouter } from 'expo-router';
-import { searchFlights,searchAirports,searchFlightEveryWhere } from '@/utils/skyScrapperApi';
+import { searchFlights, searchAirports, searchFlightEveryWhere } from '@/utils/skyScrapperApi';
 import FlightCard from '@/components/search/flightCard';
 import { Data } from '@/constants/data';
-
 
 const { width, height } = Dimensions.get("window");
 const screenWidth = Dimensions.get("window").width;
@@ -34,32 +33,36 @@ const screenWidth = Dimensions.get("window").width;
 const TRIP_TYPES = ['Round trip', 'One way'];
 const FLIGHT_CLASSES = ['Economy', 'Premium', 'Business', 'First'];
 
-
 const index = () => {
-
   const router = useRouter();
 
   const [tripType, setTripType] = useState('Round trip');
   const [travelers, setTravelers] = useState(1);
   const [flightClass, setFlightClass] = useState('Economy');
-
   const [departure, setDeparture] = useState('London');
   const [destination, setDestination] = useState('Paris');
 
-  // Set initial dates based on the screenshot for visual accuracy
-  const initialDepartureDate = new Date(2025, 9, 8); // October is month 9 (0-indexed)
+  const initialDepartureDate = new Date(2025, 9, 8);
   const initialReturnDate = new Date(2025, 9, 11);
-
   const [departureDate, setDepartureDate] = useState(initialDepartureDate);
   const [returnDate, setReturnDate] = useState(initialReturnDate);
 
   const [isDeparturePickerVisible, setDeparturePickerVisibility] = useState(false);
   const [isReturnPickerVisible, setReturnPickerVisibility] = useState(false);
-
   const [isTripTypeModalVisible, setTripTypeModalVisible] = useState(false);
   const [isTravelersModalVisible, setTravelersModalVisible] = useState(false);
   const [isClassModalVisible, setClassModalVisible] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [flights, setFlights] = useState<any[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Refetch data when any search parameter changes
+  useEffect(() => {
+    if (hasSearched) {
+      handleSearch();
+    }
+  }, [tripType, travelers, flightClass, departure, destination, departureDate, returnDate]);
 
   const showDeparturePicker = () => setDeparturePickerVisibility(true);
   const hideDeparturePicker = () => setDeparturePickerVisibility(false);
@@ -100,42 +103,43 @@ const index = () => {
     </Modal>
   );
 
-  const [loading, setLoading] = useState(false);
-  const [flights, setFlights] = useState<any[]>([]);
-  
-
   const handleSearch = async () => {
     setLoading(true);
+    setHasSearched(true);
     try {
-      // Step 1: Get skyIds
-    //   const originData: any = await searchAirports(departure);
-    //   const destinationData: any = await searchAirports(destination);
+      const originData: any = await searchAirports(departure);
+      const destinationData: any = await searchAirports(destination);
 
-    //   const originSkyId = originData.data[0].skyId;
-    //   const originEntityId = originData.data[0].entityId;
+      const originSkyId = originData.data[0].skyId;
+      const originEntityId = originData.data[0].entityId;
+      const destinationSkyId = destinationData.data[0].skyId;
+      const destinationEntityId = destinationData.data[0].entityId;
 
-    //   const destinationSkyId = destinationData.data[0].skyId;
-    //   const destinationEntityId = destinationData.data[0].entityId;
-
-    //   // Step 2: Search flights
-    //   const _flights: any = await searchFlights(originSkyId, destinationSkyId, departureDate,travelers,flightClass,returnDate,originEntityId,destinationEntityId);
-    //   console.log(_flights);
-      // setFlights(_flights);
+      const _flights: any = await searchFlights(
+        originSkyId, 
+        destinationSkyId, 
+        departureDate,
+        travelers,
+        flightClass,
+        returnDate,
+        originEntityId,
+        destinationEntityId
+      );
+      
+      setFlights(_flights.data.itineraries || []);
     } catch (err) {
       console.error("Error:", err);
+      setFlights([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-
-
-  
   return (
-    <SafeAreaView
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-         behavior={Platform.OS === 'ios'? 'padding' : 'height'}
-         style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -144,186 +148,178 @@ const index = () => {
             margin: 'auto'
           }}
         >  
-            <View style={styles.headerContainer}>
-                {
-                  Data ? <Text style={styles.headerText}>Search Flights</Text> : ''
-                }
-            </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>Search Flights</Text>
+          </View>
           
-            <View 
-              style={styles.flightsContainer}
-            >
-               <View style={styles.searchContainer}>
-                
-                  <View style={styles.topOptionsRow}>
-                    <TouchableOpacity style={styles.optionButton} onPress={() => setTripTypeModalVisible(true)}>
-                      <Ionicons name="swap-horizontal" size={16} color="black" />
-                      <Text style={styles.optionText}>{tripType}</Text>
-                      <Ionicons name="chevron-down" size={16} color="#000" />
-                    </TouchableOpacity>
+          <View style={styles.flightsContainer}>
+            <View style={styles.searchContainer}>
+              <View style={styles.topOptionsRow}>
+                <TouchableOpacity style={styles.optionButton} onPress={() => setTripTypeModalVisible(true)}>
+                  <Ionicons name="swap-horizontal" size={16} color="black" />
+                  <Text style={styles.optionText}>{tripType}</Text>
+                  <Ionicons name="chevron-down" size={16} color="#000" />
+                </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.optionButton} onPress={() => setTravelersModalVisible(true)}>
-                      <Ionicons name="person" size={16} color="#000" />
-                      <Text style={styles.optionText}>{travelers}</Text>
-                      <Ionicons name="chevron-down" size={16} color="#000" />
-                    </TouchableOpacity>
+                <TouchableOpacity style={styles.optionButton} onPress={() => setTravelersModalVisible(true)}>
+                  <Ionicons name="person" size={16} color="#000" />
+                  <Text style={styles.optionText}>{travelers}</Text>
+                  <Ionicons name="chevron-down" size={16} color="#000" />
+                </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.optionButton} onPress={() => setClassModalVisible(true)}>
-                      <Text style={styles.optionText}>{flightClass}</Text>
-                      <Ionicons name="chevron-down" size={16} color="#000" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.locationRow}>
-                    <View style={styles.inputContainer}>
-                      <TextInput 
-                        style={styles.textInput} 
-                        value={departure} 
-                        onChangeText={setDeparture} 
-                        placeholderTextColor="#8E8E93" 
-                        placeholder='Where from ?'
-                      />
-                    </View>
-                    <View style={styles.swapButton} >
-                      <Ionicons name="swap-vertical" size={24} color="#FFF" />
-                    </View>
-                    <View style={styles.inputContainer}>
-                      <TextInput 
-                        style={styles.textInput} 
-                        value={destination} 
-                        onChangeText={setDestination} 
-                        placeholderTextColor="#8E8E93" 
-                        placeholder='Where to ?'
-                      />
-                    </View>
-                  </View>
-                  
-                  <View style={styles.separator} />
-
-                  <View style={styles.dateRow}>
-                    <TouchableOpacity onPress={showDeparturePicker} style={styles.datePicker}>
-                      <Ionicons name="calendar" size={24} color="black" style={{ marginRight: 15 }} />
-                      <Text style={styles.dateText}>{formatDate(departureDate)}</Text>
-                    </TouchableOpacity>
-                    <View style={styles.dateSeparator} />
-                    <TouchableOpacity 
-                      onPress={showReturnPicker} 
-                      style={styles.datePicker} 
-                      disabled={tripType === 'One way'}>
-                      <Text style={[styles.dateText, tripType === 'One way' && styles.disabledText]}>
-                        {tripType === 'One way' ? '---' : formatDate(returnDate)}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity 
-                    style={styles.searchButton}
-                    onPress={handleSearch}
-                  >
-                    <Text style={styles.searchButtonText}>Search</Text>
-                  </TouchableOpacity>
-                </View>
-            
-            </View> 
-            <View style={styles.results}>
-              <Text>Results: </Text>
-              <View
-                style={{
-                  marginTop: 25
-                }}
-              >
-                {Data.map((entry) =>
-                  entry.data.itineraries.map((itinerary) => (
-                    <FlightCard key={itinerary.id} data={itinerary} />
-                  ))
-                )}
-
+                <TouchableOpacity style={styles.optionButton} onPress={() => setClassModalVisible(true)}>
+                  <Text style={styles.optionText}>{flightClass}</Text>
+                  <Ionicons name="chevron-down" size={16} color="#000" />
+                </TouchableOpacity>
               </View>
-            
-            </View> 
-             <OptionModal
-                visible={isTripTypeModalVisible}
-                onClose={() => setTripTypeModalVisible(false)}
-                options={TRIP_TYPES}
-                selected={tripType}
-                onSelect={(option: any) => {
-                  setTripType(option);
-                  setTripTypeModalVisible(false);
-                }}
-              />
-              <OptionModal
-                visible={isClassModalVisible}
-                onClose={() => setClassModalVisible(false)}
-                options={FLIGHT_CLASSES}
-                selected={flightClass}
-                onSelect={(option: any) => {
-                  setFlightClass(option);
-                  setClassModalVisible(false);
-                }}
-              />    
-            <Modal visible={isTravelersModalVisible} transparent={true} animationType="fade" onRequestClose={() => setTravelersModalVisible(false)}>
-              <Pressable style={styles.modalOverlay} onPress={() => setTravelersModalVisible(false)}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalTitle}>Travelers</Text>
-                  <View style={styles.travelerControlRow}>
-                    <TouchableOpacity style={styles.controlButton} onPress={() => setTravelers(prev => Math.max(1, prev - 1))}>
-                      <Ionicons name="remove-circle-outline" size={32} color={'black'} />
-                    </TouchableOpacity>
-                    <Text style={styles.travelerCount}>{travelers}</Text>
-                    <TouchableOpacity style={styles.controlButton} onPress={() => setTravelers(prev => prev + 1)}>
-                      <Ionicons name="add-circle-outline" size={32} color={'black'} />
-                    </TouchableOpacity>
+
+              <View style={styles.locationRow}>
+                <View style={styles.inputContainer}>
+                  <TextInput 
+                    style={styles.textInput} 
+                    value={departure} 
+                    onChangeText={setDeparture} 
+                    placeholderTextColor="#8E8E93" 
+                    placeholder='Where from ?'
+                  />
+                </View>
+                <View style={styles.swapButton}>
+                  <Ionicons name="swap-vertical" size={24} color="#FFF" />
+                </View>
+                <View style={styles.inputContainer}>
+                  <TextInput 
+                    style={styles.textInput} 
+                    value={destination} 
+                    onChangeText={setDestination} 
+                    placeholderTextColor="#8E8E93" 
+                    placeholder='Where to ?'
+                  />
+                </View>
+              </View>
+              
+              <View style={styles.separator} />
+
+              <View style={styles.dateRow}>
+                <TouchableOpacity onPress={showDeparturePicker} style={styles.datePicker}>
+                  <Ionicons name="calendar" size={24} color="black" style={{ marginRight: 15 }} />
+                  <Text style={styles.dateText}>{formatDate(departureDate)}</Text>
+                </TouchableOpacity>
+                <View style={styles.dateSeparator} />
+                <TouchableOpacity 
+                  onPress={showReturnPicker} 
+                  style={styles.datePicker} 
+                  disabled={tripType === 'One way'}>
+                  <Text style={[styles.dateText, tripType === 'One way' && styles.disabledText]}>
+                    {tripType === 'One way' ? '---' : formatDate(returnDate)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity 
+                style={styles.searchButton}
+                onPress={handleSearch}
+                disabled={loading}
+              >
+                <Text style={styles.searchButtonText}>Search</Text>
+              </TouchableOpacity>
+            </View>
+          </View> 
+
+          {/* Results Container - Only show when there's data and user has searched */}
+          {hasSearched && (
+            <View style={styles.results}>
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#1280ED" />
+                  <Text style={styles.loadingText}>Searching for flights...</Text>
+                </View>
+              ) : flights.length > 0 ? (
+                <>
+                  <Text style={styles.resultsTitle}>Results ({flights.length})</Text>
+        
+                  <View style={styles.resultsList}>
+                    {flights.map((itinerary: any) => (
+                      <FlightCard key={itinerary.id} data={itinerary} adults={travelers} currency={'USD'} locale={'en-US'} cabinClass={flightClass} market={'en-US'} countryCode={'US'} />
+                    ))}
                   </View>
-                  <TouchableOpacity style={styles.doneButton} onPress={() => setTravelersModalVisible(false)}>
-                      <Text style={styles.doneButtonText}>Done</Text>
+                </>
+              ) : (
+                <View style={styles.noResultsContainer}>
+                  <Ionicons name="sad-outline" size={48} color="#888" />
+                  <Text style={styles.noResultsText}>No flights found</Text>
+                  <Text style={styles.noResultsSubtext}>Try different dates or destinations</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Modals */}
+          <OptionModal
+            visible={isTripTypeModalVisible}
+            onClose={() => setTripTypeModalVisible(false)}
+            options={TRIP_TYPES}
+            selected={tripType}
+            onSelect={(option: any) => {
+              setTripType(option);
+              setTripTypeModalVisible(false);
+            }}
+          />
+          <OptionModal
+            visible={isClassModalVisible}
+            onClose={() => setClassModalVisible(false)}
+            options={FLIGHT_CLASSES}
+            selected={flightClass}
+            onSelect={(option: any) => {
+              setFlightClass(option);
+              setClassModalVisible(false);
+            }}
+          />    
+          <Modal visible={isTravelersModalVisible} transparent={true} animationType="fade" onRequestClose={() => setTravelersModalVisible(false)}>
+            <Pressable style={styles.modalOverlay} onPress={() => setTravelersModalVisible(false)}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Travelers</Text>
+                <View style={styles.travelerControlRow}>
+                  <TouchableOpacity style={styles.controlButton} onPress={() => setTravelers(prev => Math.max(1, prev - 1))}>
+                    <Ionicons name="remove-circle-outline" size={32} color={'black'} />
+                  </TouchableOpacity>
+                  <Text style={styles.travelerCount}>{travelers}</Text>
+                  <TouchableOpacity style={styles.controlButton} onPress={() => setTravelers(prev => prev + 1)}>
+                    <Ionicons name="add-circle-outline" size={32} color={'black'} />
                   </TouchableOpacity>
                 </View>
-              </Pressable>
-            </Modal>
-            <Modal visible={loading} transparent={true} animationType="fade" onRequestClose={() => setLoading(false)}>
-                <Pressable style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: '600',
-                      marginVertical: 30
-                    }}
-                  >Loading...</Text>
-                  <ActivityIndicator size="large" color={'#1d2855'} style={{
-                    marginBottom: 30 
-                  }}/>
-                </View>
-              </Pressable>
-            </Modal>
- 
-            <DateTimePickerModal
-                isVisible={isDeparturePickerVisible}
-                mode="date"
-                onConfirm={handleDepartureConfirm}
-                onCancel={hideDeparturePicker}
-                date={departureDate}
-            />
-            <DateTimePickerModal
-                isVisible={isReturnPickerVisible}
-                mode="date"
-                onConfirm={handleReturnConfirm}
-                onCancel={hideReturnPicker}
-                date={returnDate}
-            />
+                <TouchableOpacity style={styles.doneButton} onPress={() => setTravelersModalVisible(false)}>
+                  <Text style={styles.doneButtonText}>Done</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Modal>
+
+          <DateTimePickerModal
+            isVisible={isDeparturePickerVisible}
+            mode="date"
+            onConfirm={handleDepartureConfirm}
+            onCancel={hideDeparturePicker}
+            date={departureDate}
+          />
+          <DateTimePickerModal
+            isVisible={isReturnPickerVisible}
+            mode="date"
+            onConfirm={handleReturnConfirm}
+            onCancel={hideReturnPicker}
+            date={returnDate}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
-  </SafeAreaView>
+    </SafeAreaView>
   )
 }
 
 export default index;
 
 const styles = StyleSheet.create({
-   container: { 
+  container: { 
     flex: 1, 
     backgroundColor: "#fff",
-    // marginTop: 50 
   },
   headerContainer: {
     marginTop: 20
@@ -334,27 +330,6 @@ const styles = StyleSheet.create({
   },
   flightsContainer: {
     marginTop: 30
-  },
-  flightsHeaderText: {
-    fontSize: 20,
-    fontWeight: '500'
-  },
-  subSectionFlight: {
-    marginTop: 30,
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'center'
-  },
-  flightSelect: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    borderWidth: 1,
-    padding: 8,
-    borderRadius: 5,
-    borderColor: '#1280ED'
   },
   searchContainer: {
     backgroundColor: '',
@@ -449,7 +424,47 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: 'white'
   },
-  disabledText: { color: 'black'},
+  disabledText: { color: 'black' },
+
+  // Results Styles
+  results: {
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  resultsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: '#1A1A1A',
+  },
+  resultsList: {
+    gap: 15,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: '#666',
+  },
+  noResultsContainer: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  noResultsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#666',
+    marginTop: 15,
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 5,
+    textAlign: 'center',
+  },
 
   // Modal Styles
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
@@ -465,8 +480,4 @@ const styles = StyleSheet.create({
   travelerCount: { color: 'black', fontSize: 36, fontWeight: 'bold', marginHorizontal: 20 },
   doneButton: { backgroundColor: '', paddingVertical: 12, paddingHorizontal: 40, borderRadius: 25 },
   doneButtonText: { color: 'black', fontSize: 16, fontWeight: 'bold' },
-  results: {
-    marginTop: 20
-  }
-
-})
+});

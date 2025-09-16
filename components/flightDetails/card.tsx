@@ -5,6 +5,7 @@ import { getToken } from '@/utils/token';
 
 const FlightCard = ({ data }: any) => {
     const router = useRouter();
+    console.log(data);
     const itinerary = data.data.itinerary;
     const legs = itinerary.legs;
     const pricingOptions = itinerary.pricingOptions;

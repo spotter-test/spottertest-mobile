@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 
-const FlightCard = ({ data }: any) => {
+const FlightCard = ({ data,adults,currency,locale,market,cabinClass,countryCode }: any) => {
     const router = useRouter();
     const firstLeg = data.legs[0];
     const airline = firstLeg.carriers.marketing[0];
@@ -10,29 +10,40 @@ const FlightCard = ({ data }: any) => {
     return (
         <TouchableOpacity 
             style={styles.container}
-            onPress={() => router.push('/flightDetails')}
+            onPress={() => router.push({
+                pathname: '/flightDetails',
+                params: { 
+                    legs: data.legs, 
+                    adults, 
+                    currency, 
+                    locale, 
+                    market, 
+                    cabinClass, 
+                    countryCode 
+                }
+            })}
         >
             <View style={styles.card}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.price}>{data.price.formatted}</Text>
+                    <Text style={styles.price}>{data.price.formatted||''}</Text>
                     {data.tags?.includes('cheapest') && (
-                        <Text style={styles.tag}>💰 Cheapest</Text>
+                        <Text style={styles.tag || ''}>💰 Cheapest</Text>
                     )}
                 </View>
 
                 {/* Route */}
                 <Text style={styles.route}>
-                    {firstLeg.origin.displayCode} → {firstLeg.destination.displayCode}
+                    {firstLeg.origin.displayCode || ''} → {firstLeg.destination.displayCode || ''}
                 </Text>
 
                 {/* Airline */}
                 <View style={styles.airlineContainer}>
                     <Image 
-                        source={{ uri: airline.logoUrl }} 
+                        source={{ uri: airline.logoUrl || '' }} 
                         style={styles.airlineLogo}
                     />
-                    <Text style={styles.airlineName}>{airline.name}</Text>
+                    <Text style={styles.airlineName}>{airline.name || ''}</Text>
                 </View>
 
                 {/* Flight Times */}
