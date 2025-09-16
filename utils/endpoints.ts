@@ -1,4 +1,4 @@
-const api_url = 'http://192.168.0.101:5000'
+const api_url = 'http://192.168.100.55:5000'
 const flighturl = 'https://rapidapi.com/apiheya/api/sky-scrapper'
 
 

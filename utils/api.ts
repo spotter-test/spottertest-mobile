@@ -30,7 +30,7 @@ export const updatePassword = async(data: any) => {
     const {currentPassword,newPassword} = data;
     const token = await getToken();
     const response = await fetch(updatePasswordUrl,{
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

@@ -7,7 +7,9 @@ import {
     Platform,
     Image,
     KeyboardAvoidingView,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator,
+    Dimensions
   } from 'react-native'
   import { SafeAreaView } from 'react-native-safe-area-context';
   import Entypo from '@expo/vector-icons/Entypo';
@@ -23,10 +25,13 @@ import {
   import { useAuth } from '@/hooks/useAuth';
   import Toast from 'react-native-toast-message';
   import ModalPopup from '@/components/ModalPopup';
+
+  const {width,height} = Dimensions.get('window');
   
   const index = () => {
     const {email,previous_screen} = useLocalSearchParams();
     const [showPassword,setShowPassword] = useState(false);
+    const [shownewPassword,setShowNewPassword] = useState(false);
     const [loading,setLoading] = useState(false);
     const {UpdatePassword} = useAuth();
     const [visible,setVisible] = useState(false);
@@ -38,19 +43,29 @@ import {
       },
       validationSchema: Yup.object({}),
       onSubmit: async(values) => {  
+        setLoading(true);
         // setVisible(true);
         if (!values.password || !values.confirmPassword) {
+          setLoading(false);
           alert('Please fill in both password fields');
-          return; // Stop execution
+          return; 
         }
         const response = await UpdatePassword({
           currentPassword: values.password,
           newPassword: values.confirmPassword
         })
-        console.log(response)
-        // if(response.statusCode == 200){
+        if(response.status == 'error'){
+          Toast.show({
+                      text1: response.message,
+                      text2: '',
+                      type: 'error',
+                    })
+                    setLoading(false);
         
-        // }
+        }else {
+          setVisible(true)
+          setLoading(false);
+        }
       },
     });
     
@@ -136,15 +151,15 @@ import {
                       placeholder="New Password"
                       keyboardType="default"
                       style={styles.loginInput}
-                      secureTextEntry={!showPassword}
+                      secureTextEntry={!shownewPassword}
                       onChangeText={formData.handleChange('confirmPassword')}
                       onBlur={formData.handleBlur('confirmPassword')}
                     />
                     <TouchableOpacity
-                      onPress={() => setShowPassword(!showPassword)}
+                      onPress={() => setShowNewPassword(!shownewPassword)}
                     >
                       <Entypo 
-                        name={showPassword ? 'eye' : 'eye-with-line'} 
+                        name={shownewPassword ? 'eye' : 'eye-with-line'} 
                         size={20} 
                         color="black" 
                       />
@@ -154,12 +169,24 @@ import {
               <View
                 style={styles.button}
               >
-                <CustomeButtom 
-                  title="Change password" 
-                  onPress={formData.handleSubmit}
-                  color={'#1280ED'}
-                  isLoading={loading}
-                />
+                 <TouchableOpacity 
+                                    style={styles.containerStyle}
+                                    onPress={() => formData.handleSubmit()}
+                                  >
+                                    <View
+                                      style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        flex: 1
+                                      }}
+                                    >
+                                      {
+                                        loading ? <ActivityIndicator size={130} color={'#ffffff'}/> :  <Text
+                                        style={styles.textStyle}
+                                      >{'Change password'}</Text>
+                                      }
+                                    </View>
+                                  </TouchableOpacity>
               </View>
               <ModalPopup 
                 visible={visible}
@@ -281,5 +308,21 @@ import {
       shadowOpacity: 0.3,
       shadowRadius: 4,
     },
+    containerStyle: {
+      backgroundColor: '#1280ED',
+      padding: 15,
+      borderRadius: 10,
+      margin: 10,
+      alignSelf: 'center',
+      width: '100%',
+      height: height / 13,
+      marginTop: '30%'
+    },
+    textStyle: {
+      color: 'white',
+      fontSize: 20,
+      fontWeight: 'medium',
+      textAlign: 'center',
+    }
   
   })
