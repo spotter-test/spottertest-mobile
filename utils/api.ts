@@ -8,18 +8,15 @@ import {
 import { getToken } from "./token";
  
 
-export const getUser = async(email: string) => {
+export const getUser = async() => {
     try {
         const token = await getToken();
         const response = await fetch(getUserUrl,{
-            method: 'post',
+            method: 'get',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                email
-            }),
+            }
         })
          
         const data = await response.json(); // Extract the actual JSON content
@@ -70,7 +67,21 @@ export const  Login = async(data:any) => {
         },
         body: JSON.stringify(data),
     })
-    console.log(response)
+
+    return response;
+}
+
+export const UpdateUserData = async(data: any) => {
+    const token = await getToken()
+    const response = await fetch(updateUrl,{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    })
+
 
     return response;
 }

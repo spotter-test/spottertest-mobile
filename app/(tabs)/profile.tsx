@@ -3,7 +3,6 @@ import {
   Text, 
   View,
   ScrollView,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Image,
@@ -18,6 +17,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import ModalPopup from '@/components/ModalPopup';
 import CustomeButtom from '@/components/CustomeButtom';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const index = () => {

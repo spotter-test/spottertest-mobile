@@ -3,7 +3,8 @@ import {
     SignUp,
     Login,
     updatePassword,
-    getUser
+    getUser,
+    UpdateUserData
 } from "@/utils/api";
 
 import { storeToken } from "@/utils/token";
@@ -14,8 +15,8 @@ export const useAuth = () => {
     const [notification,setNotification] = useState(false);
 
 
-    const GetUser = async(email: string) => {
-        const response: any = await getUser(email);
+    const GetUser = async() => {
+        const response: any = await getUser();
         return response;
     }
 
@@ -48,6 +49,11 @@ export const useAuth = () => {
         return responseData;
     }
 
+    const UpdateData = async(data: any) => {
+        const response = await UpdateUserData(data);
+        const responseData = await response.json();
+        return responseData;
+    }
 
     return {
         CreateAccount,
@@ -55,7 +61,8 @@ export const useAuth = () => {
         _error,
         notification,
         UpdatePassword,
-        GetUser
+        GetUser,
+        UpdateData
     };
 };
   

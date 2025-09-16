@@ -17,7 +17,7 @@ import {
   import { router } from 'expo-router';
   import * as Yup from 'yup';
   import {useFormik} from 'formik';
-//   import { useAuth } from '@/hooks/useAuth';
+  import { useAuth } from '@/hooks/useAuth';
   import Toast from 'react-native-toast-message';
   import ModalPopup from '@/components/ModalPopup';
   import CustomeButtom from '@/components/CustomeButtom';
@@ -30,40 +30,49 @@ import {
     const [showloader,setShowLoader] = useState(false);
     const [loading,setLoading] = useState(false);
     const userData = {}
-    // const {GetUser} = useAuth();
+    const {GetUser,UpdateData} = useAuth();
     const [visible,setVisible] = useState(false);
 
-    // const loaduserData = async () => {
-    //   if(userData){
-    //     const data:any  = await GetUser(userData);
-    //     signUpForm.setValues({
-    //       firstname: data.user.firstname || '',
-    //       lastname: data.user.lastname || '',
-    //       email: data.user.email || '',
-    //       phonenumber: data.user.phonenumber || ''
-    //     });
-    //   }
-    // };
+    const loaduserData = async () => {
+     
+        const data:any  = await GetUser();
+        console.log(data);
+        signUpForm.setValues({
+          firstname: data.data.user._doc.firstName || '',
+          lastname: data.data.user._doc.lastName || '',
+          email: data.data.user._doc.email || ''
+        });
+      
+    };
 
-    // useEffect(() => {
-    //   loaduserData();
-    // }, [userData]);
+    useEffect(() => {
+      loaduserData();
+    }, []);
 
 
     const signUpForm = useFormik({
       initialValues: {
         firstname: '',
         lastname: '',
-        email: '',
-        phonenumber: ''
+        email: ''
       },
       validationSchema: Yup.object().shape({}),
       onSubmit: async (values, actions) => {
-        setVisible(true);
+        setShowLoader(true);
         try {
-  
+             const updatedData = {
+                firstName: values.firstname,
+                lastName: values.lastname,
+                email: values.email
+              };
+              const data = await UpdateData(updatedData);
+              if(data.status == 'success') {
+                setVisible(true);
+                setShowLoader(false);
+              } 
         
         } catch (err) {
+          setShowLoader(false);
           console.error('Account creation failed:', err);
           // Optionally show error to the user
           Toast.show({
@@ -134,20 +143,7 @@ import {
                     />
                   </View>
                 </View>
-  
-                <View style={{ marginTop: 20 }}>
-                  <Text style={styles.loginTextHeader}>Phone number </Text>
-                  <View style={styles.loginContainerText}>
-                    <TextInput
-                      placeholder=""
-                      keyboardType="number-pad"
-                      style={styles.loginInput}
-                      value={signUpForm.values.phonenumber}
-                      onChangeText={signUpForm.handleChange('phonenumber')}
-                      onBlur={signUpForm.handleBlur('phonenumber')}
-                    />
-                  </View>
-                </View>
+
 
                   <TouchableOpacity 
                     style={styles.containerStyle}
